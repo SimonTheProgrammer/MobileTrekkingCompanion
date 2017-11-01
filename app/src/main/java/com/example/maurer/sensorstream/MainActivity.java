@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 board.tearDown(); //shuts down the board -> saves energy
             }
         });
+        //Yooo
 
         //Battery level Listener:
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
