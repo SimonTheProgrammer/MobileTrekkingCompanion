@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.DeviceInformation;
@@ -24,6 +25,7 @@ import com.mbientlab.metawear.builder.filter.ThresholdOutput;
 import com.mbientlab.metawear.builder.function.Function1;
 import com.mbientlab.metawear.data.Acceleration;
 import com.mbientlab.metawear.module.Accelerometer;
+import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.Led;
 
 import bolts.Continuation;
@@ -32,7 +34,9 @@ import bolts.Task;
 
 public class MainActivity extends AppCompatActivity implements ServiceConnection{
     private BtleService.LocalBinder serviceBinder;
+    private MetaWearBoard board;
     private Accelerometer accelerometer;
+    private GyroBmi160 gyro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +93,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         serviceBinder = (BtleService.LocalBinder) iBinder;
-
         Log.wtf("sensorstream","Service Connected");
 
         retrieveBoard("C6:EE:AA:23:E4:4F"); //Board Simon (+Drucksensor)
+
+        //Sensoren einstellen:
+        accelerometer = board.getModule(Accelerometer.class);
+      /*  accelerometer.configure()
+                .odr(60f)   // Sampling frequency(50Hz)
+                .commit();
+
+        gyro.configure()
+                .odr(GyroBmi160.OutputDataRate.ODR_25_HZ)
+                .range(GyroBmi160.Range.FSR_125)
+                .commit();*/
     }
 
     @Override
@@ -107,8 +121,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getApplicationContext().unbindService(this);
     }
 
-    private MetaWearBoard board;
-
     public void retrieveBoard(final String macAddr) {
         final BluetoothManager btManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -118,58 +130,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         // MetaWear board object for the Bluetooth Device
         board = serviceBinder.getMetaWearBoard(remoteDevice);
 
-        board.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
+        board.connectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
-            public Task<Route> then(Task<Void> task) throws Exception {
-                Log.wtf("sensorstream", "Connected to " + macAddr);
-
-                // Accelerometer data:
-                accelerometer = board.getModule(Accelerometer.class);
-                accelerometer.configure()
-                        .odr(60f)   // Sampling frequency(50Hz)
-                        .commit();
-                return accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
-                    @Override
-                    public void configure(RouteComponent source) {
-                        // get the average output from 10 samples
-                        source.map(Function1.RSS).average((byte) 10).filter(ThresholdOutput.BINARY, 0.5f)
-                                .multicast()
-                                //Minuszahlen:
-                                .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
-                                    @Override
-                                    public void apply(Data data, Object... env) {
-                                        Log.i("sensorstream", "in freefall");
-                                    }
-                                })
-                                //Pluszahlen:
-                                .to().filter(Comparison.EQ, 1).stream(new Subscriber() {
-                                    @Override
-                                    public void apply(Data data, Object... env) {
-                                        Log.i("sensorstream", "NOT in freefall; good to go");
-                                    }
-                                })
-                                .end();
-
-                        //Raw data:
-                        /*source.stream(new Subscriber() {
-                            @Override
-                            public void apply(Data data, Object... env) {
-                                Log.i("sensorstream", data.value(Acceleration.class).toString());
-                            }
-                        });*/
-                    }
-                });
-            }
-        }).continueWith(new Continuation<Route, Void>() {
-            @Override
-            public Void then(Task<Route> task) throws Exception {
-                if (task.isFaulted()){
-                    Log.i("sensorstream","Failed to configure app", task.getError());
-                } else{
-                    Log.i("sensorstream", "app configured");
+            public Void then(Task<Void> task) throws Exception {
+                if (task.isFaulted()) {
+                    Log.i("Board", "Connection failed");
+                } else {
+                    Log.i("Board", "Connected to " + macAddr);
+                    playLed(Led.Color.GREEN); //output for user
                 }
+                return null;
+            }
+        });
+        Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
 
-                //Board information (3):
                 // get Signal strength (RSSI):
                 board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
                     @Override
@@ -187,19 +161,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                 return null;
                             }
                         });
-                return null;
-            }
 
-        });
-        // Verbindungsabbruch:
-        board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
-            @Override
-            public void disconnected(int status) {
-                Log.i("MainActivity", "Unexpectedly lost connection: " + status);
-            }
-        });
+                // Verbindungsabbruch:
+                board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
+                    @Override
+                    public void disconnected(int status) {
+                        Log.i("MainActivity", "Unexpectedly lost connection: " + status);
+                    }
+                });
 
-        //Manueller Verbindungsabbruch: (nötig?)
+        //Manueller Verbindungsabbruch:
         /*board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
             public Void then(Task<Void> task) throws Exception {
@@ -207,11 +178,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });*/
+    }
 
+    private void playLed(Led.Color colour) {
+        //LED
         Led led;
         if ((led= board.getModule(Led.class)) != null) {
-            led.editPattern(Led.Color.RED, Led.PatternPreset.BLINK)
-                    .repeatCount((byte) 20)
+            led.editPattern(colour, Led.PatternPreset.BLINK)
+                    .repeatCount((byte) 11) //plays led 10 times
                     .commit();
             led.play();
         }
