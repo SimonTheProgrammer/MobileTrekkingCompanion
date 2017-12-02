@@ -42,4 +42,14 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:id="@+id/battery" />
+
+    <TextView
+        android:text="Connection Status\n (which is nice)"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Con_status"
+        android:textColor="@color/choco"
+        android:layout_marginEnd="29dp"
+        android:layout_alignTop="@+id/stop"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

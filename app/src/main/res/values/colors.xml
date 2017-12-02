@@ -3,4 +3,7 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="error">#FF2321</color>
+    <color name="accepted">#7CFB14</color>
+    <color name="choco">#D2691E</color>
 </resources>

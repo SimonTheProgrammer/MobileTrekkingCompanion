@@ -1,9 +1,15 @@
 package com.example.maurer.sensorstream;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
+import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,18 +18,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.DeviceInformation;
 import com.mbientlab.metawear.MetaWearBoard;
-import com.mbientlab.metawear.Route;
-import com.mbientlab.metawear.Subscriber;
 import com.mbientlab.metawear.android.BtleService;
-import com.mbientlab.metawear.builder.RouteBuilder;
-import com.mbientlab.metawear.builder.RouteComponent;
-import com.mbientlab.metawear.builder.filter.Comparison;
-import com.mbientlab.metawear.builder.filter.ThresholdOutput;
-import com.mbientlab.metawear.builder.function.Function1;
-import com.mbientlab.metawear.data.Acceleration;
 import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.Led;
@@ -37,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private MetaWearBoard board;
     private Accelerometer accelerometer;
     private GyroBmi160 gyro;
+    private Accelerometer_stream t;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,13 +44,26 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getApplicationContext().bindService(new Intent(this, BtleService.class),
                 this, Context.BIND_AUTO_CREATE);
 
+        //Turn on Bluetooth (if disabled)
+        //new Bluetooth().execute();
+
         // configure start button:
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("sensorstream","start");
-                accelerometer.acceleration().start();
-                accelerometer.start();
+                //Sensoren einstellen:
+                accelerometer = board.getModule(Accelerometer.class);
+                accelerometer.configure()
+                        .odr(25f) //Sampling frequency
+                        .range(4f)
+                        .commit();
+
+                t = new Accelerometer_stream();
+
+                t.execute(accelerometer);
+
+                /*accelerometer.acceleration().start();*/
             }
         });
         // configure stop button:
@@ -61,7 +72,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View view) {
                 Log.i("sensorstream","stop");
                 accelerometer.stop();
-                accelerometer.acceleration().stop();
+                t.cancel(true);
+                /*accelerometer.stop();
+                accelerometer.acceleration().stop();*/
             }
         });
         //configure reset button:
@@ -71,21 +84,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 board.tearDown(); //shuts down the board -> saves energy
             }
         });
-
+        final Activity act = this;
         //Battery level Listener:
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final TextView v = (TextView) findViewById(R.id.battery);
-                board.readBatteryLevelAsync()
-                        .continueWith(new Continuation<Byte, Void>() {
-                            @Override
-                            public Void then(final Task<Byte> task) throws Exception {
-                                Log.i("sensorstream", "Battery level: "+task.getResult()+"%");
-                                v.setText("Battery level: "+task.getResult()+"%");
-                                return null;
-                            }
-                        });
+                new BatteryListener(act).execute(board);
+                //Integer.toHexString(new BatteryListener().getBatteryLife());
+                Log.i("wtffff",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
             }
         });
     }
@@ -96,17 +103,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Log.wtf("sensorstream","Service Connected");
 
         retrieveBoard("C6:EE:AA:23:E4:4F"); //Board Simon (+Drucksensor)
-
-        //Sensoren einstellen:
-        accelerometer = board.getModule(Accelerometer.class);
-      /*  accelerometer.configure()
-                .odr(60f)   // Sampling frequency(50Hz)
-                .commit();
-
-        gyro.configure()
-                .odr(GyroBmi160.OutputDataRate.ODR_25_HZ)
-                .range(GyroBmi160.Range.FSR_125)
-                .commit();*/
     }
 
     @Override
@@ -134,17 +130,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public Void then(Task<Void> task) throws Exception {
                 if (task.isFaulted()) {
-                    Log.i("Board", "Connection failed");
+                    Lost();
                 } else {
                     Log.i("Board", "Connected to " + macAddr);
-                    playLed(Led.Color.GREEN); //output for user
+                    Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
+                    playLed(Led.Color.GREEN); //Output for user
+                    TextView v = (TextView) findViewById(R.id.Con_status);
+                    v.setTextColor(getResources().getColor(R.color.accepted));
+                    v.setText("Connection succeded:");
                 }
                 return null;
             }
         });
-        Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
 
-                // get Signal strength (RSSI):
+                /*// get Signal strength (RSSI):
                 board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
                     @Override
                     public Void then(Task<Integer> task) throws Exception {
@@ -160,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                 Log.i("sensorstream", "Device Information: " + task.getResult());
                                 return null;
                             }
-                        });
+                        });*/
 
                 // Verbindungsabbruch:
                 board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
@@ -170,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                 });
 
-        //Manueller Verbindungsabbruch:
+        //Manueller Verbindungsabbruch: //YOLO
         /*board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
             public Void then(Task<Void> task) throws Exception {
@@ -178,6 +177,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });*/
+    }
+
+    private void Lost() {
+        //Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
+        Log.i("Board", "Connection failed");
+        TextView v = (TextView) findViewById(R.id.Con_status);
+        v.setText("Connection failed\n  Check Bluetooth Connection");
+        v.setTextColor(getResources().getColor(R.color.error));
+
     }
 
     private void playLed(Led.Color colour) {
@@ -190,4 +198,27 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             led.play();
         }
     }
+    /*private SensorEventListener mSensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            Sensor sensor = sensorEvent.sensor;
+            if (sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+                accelerometer.configure()
+                        .odr(60f)   // Sampling frequency(50Hz)
+                        .commit();
+                Log.i("stream","accelerometer");
+            }
+            else if (sensor.getType() == Sensor.TYPE_GYROSCOPE){
+                gyro.configure()
+                .odr(GyroBmi160.OutputDataRate.ODR_25_HZ)
+                .range(GyroBmi160.Range.FSR_125)
+                .commit();
+                Log.i("stream","gyroscope");
+            }
+
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {}
+    };*/
 }
