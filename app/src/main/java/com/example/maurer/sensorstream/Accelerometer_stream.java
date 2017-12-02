@@ -17,9 +17,11 @@ import bolts.Continuation;
 import bolts.Task;
 
 /**
- * Created by Maurer on 28.11.2017.
+ * Created by Simon, 28.11.2017.
+ *
+ * get Connection to the board & data from the onboard- Sensors
  */
-public class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
+class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
 
     @Override
     protected Void doInBackground(Accelerometer... accelerometers) {
@@ -32,7 +34,7 @@ try {
     accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
         @Override
         public void configure(RouteComponent source) {
-            source.stream(new Subscriber() {
+            System.out.println("ey");source.stream(new Subscriber() {
                 @Override
                 public void apply(Data data, Object... env) {
                     Log.i("Accelerometer",data.value(Acceleration.class).toString());
