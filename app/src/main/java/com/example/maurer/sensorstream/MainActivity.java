@@ -6,10 +6,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +19,8 @@ import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.GyroBmi160;
+import com.mbientlab.metawear.module.GyroBmi160.Range;
+import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
 
 import bolts.Continuation;
@@ -35,7 +33,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private Accelerometer accelerometer;
     private GyroBmi160 gyro;
     private Accelerometer_stream t;
+    private Barometer_stream t1;
 
+    /*
+        @author: Simon Maurer
+        @problem: Starten mehrerer Sensoren am Board (mit Threads)
+                  => müssen parallel laufen
+        @sensors:
+            Accelerometer
+            Barometer
+            Gyroskop
+            Temperatur
+            Magnetometer
+        @link: C:\...\Dropbox\201718_DA_Wanderapp\05_Tätigkeitsberichte\Programm_Simon.docx
+        @MainActivity: Wahrscheinlich etwas ausgelastet
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,23 +59,29 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         //Turn on Bluetooth (if disabled)
         //new Bluetooth().execute();
 
-        // configure start button:
+        // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("sensorstream","start");
                 //Sensoren einstellen:
+                //Beschleunigungsmesser
                 accelerometer = board.getModule(Accelerometer.class);
                 accelerometer.configure()
-                        .odr(25f) //Sampling frequency
+                        .odr(50f) //Sampling frequency
                         .range(4f)
                         .commit();
-
+                //accelerometer.start();
                 t = new Accelerometer_stream();
-
                 t.execute(accelerometer);
-
-                /*accelerometer.acceleration().start();*/
+                //Drucksensor
+                gyro = board.getModule(GyroBmi160.class);
+                gyro.configure()
+                        .odr(OutputDataRate.ODR_50_HZ)
+                        .range(Range.FSR_2000)
+                        .commit();
+                //t1 = new Barometer_stream();
+                Barometer_stream.execute((Runnable) gyro);
             }
         });
         // configure stop button:
@@ -85,7 +103,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });
         final Activity act = this;
-        //Battery level Listener:
+
+        //Battery level Listener: (Akkuanzeige)
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,9 +126,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     @Override
     public void onServiceDisconnected(ComponentName componentName) {
-        Log.wtf("sensorstream", "wtf");
+        Log.wtf("sensorstream", "Service disconnected.");
     }
 
+    //Bei Disconnet vom Service entbinden (Ressourcen freigeben)
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -117,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getApplicationContext().unbindService(this);
     }
 
+    //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
         final BluetoothManager btManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
@@ -143,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });
 
-                /*// get Signal strength (RSSI):
+                /*// get Signal strength (RSSI): selbes Problem wie unten beschrieben
                 board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
                     @Override
                     public Void then(Task<Integer> task) throws Exception {
@@ -151,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         return null;
                     }
                 });
-                //Device info:
+                //Device info: (funktioniert nicht)=> wird zu früh aufgerufen->bevor Board connected ist
                 board.readDeviceInformationAsync()
                         .continueWith(new Continuation<DeviceInformation, Void>() {
                             @Override
@@ -169,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                 });
 
-        //Manueller Verbindungsabbruch: //YOLO
+        //Manueller Verbindungsabbruch:
         /*board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
             public Void then(Task<Void> task) throws Exception {
@@ -179,6 +200,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         });*/
     }
 
+    //Aufruf, wenn Connection verloren geht; Anzeige durch TextView (fkt. nicht)
     private void Lost() {
         //Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
@@ -188,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     }
 
+    //spielt LED am Board mit bestimmter Farbe
     private void playLed(Led.Color colour) {
         //LED
         Led led;

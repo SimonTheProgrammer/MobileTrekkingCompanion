@@ -19,7 +19,10 @@ import bolts.Task;
 /**
  * Created by Simon, 28.11.2017.
  *
- * get Connection to the board & data from the onboard- Sensors
+ * nach der Koppelung mit dem Board kann man Daten von den Sensoren
+ * kriegen.
+ * => durch API von Hersteller
+ * @link:
  */
 class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
 
@@ -34,13 +37,16 @@ try {
     accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
         @Override
         public void configure(RouteComponent source) {
-            System.out.println("ey");source.stream(new Subscriber() {
+            /*source.stream(new Subscriber() {
                 @Override
                 public void apply(Data data, Object... env) {
                     Log.i("Accelerometer",data.value(Acceleration.class).toString());
-                }
-            });
-            source.map(Function1.RSS).lowpass((byte) 1).filter(ThresholdOutput.BINARY, 0.5f)
+                }=> FUNKTIONIERENDER TEIL (ROHDATEN)
+            });*/
+            //Filtern (Durchschnitt von 10 Messwerten
+            // - 1 = fallen
+            //(+)1 = erheben
+            source.map(Function1.RSS).lowpass((byte) 10).filter(ThresholdOutput.BINARY, 0.5f)
                     .multicast()
                     .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
                 @Override
@@ -61,6 +67,8 @@ try {
                 Log.i("Accelerometer", "fail");
             } else {
                 Log.i("Accelerometer", "success");
+                accelerometer.acceleration().start();
+                accelerometer.start();
             }
             return null;
         }

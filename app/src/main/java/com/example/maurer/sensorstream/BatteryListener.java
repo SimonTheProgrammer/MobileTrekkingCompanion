@@ -13,6 +13,7 @@ import bolts.Task;
 
 /**
  * Created by Maurer on 28.11.2017.
+ * @author: Akkuanzeige für Board (funktioniert nicht beim 1. Klicken)
  */
 public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
     private MetaWearBoard board;
