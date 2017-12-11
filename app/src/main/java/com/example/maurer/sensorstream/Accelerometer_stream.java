@@ -22,7 +22,7 @@ import bolts.Task;
  * nach der Koppelung mit dem Board kann man Daten von den Sensoren
  * kriegen.
  * => durch API von Hersteller
- * @link:
+ * @link: 
  */
 class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
 
