@@ -52,4 +52,13 @@
         android:layout_marginEnd="29dp"
         android:layout_alignTop="@+id/stop"
         android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_RSSi"
+        android:layout_marginTop="106dp"
+        android:layout_below="@+id/stop"
+        android:text="        " />
+
 </RelativeLayout>

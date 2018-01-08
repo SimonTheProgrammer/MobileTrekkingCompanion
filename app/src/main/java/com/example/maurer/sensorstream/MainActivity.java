@@ -1,7 +1,6 @@
 package com.example.maurer.sensorstream;
 
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
@@ -33,12 +32,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private Accelerometer accelerometer;
     private GyroBmi160 gyro;
     private Accelerometer_stream t;
-    private Barometer_stream t1;
+    private Falling_stream t1;
+    final Activity act = this;
 
-    /*
+    /**
         @author: Simon Maurer
         @problem: Starten mehrerer Sensoren am Board (mit Threads)
-                  => müssen parallel laufen
+                  => müssen parallel laufen -->(quasi-parallel!!)
         @sensors:
             Accelerometer
             Barometer
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 this, Context.BIND_AUTO_CREATE);
 
         //Turn on Bluetooth (if disabled)
-        //new Bluetooth().execute();
+        new Bluetooth().execute();
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
@@ -65,23 +65,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View view) {
                 Log.i("sensorstream","start");
                 //Sensoren einstellen:
+                /**
+                 * Accelerometer (+fallen)
+                 * Druck (mit Höhenmeter)
+                 * Temperatur
+                 * [Rest folgt] */
                 //Beschleunigungsmesser
                 accelerometer = board.getModule(Accelerometer.class);
                 accelerometer.configure()
-                        .odr(50f) //Sampling frequency
+                        .odr(5) //Sampling frequency
                         .range(4f)
                         .commit();
                 //accelerometer.start();
-                t = new Accelerometer_stream();
+                t = new Accelerometer_stream(); //Rohdaten (DB)
                 t.execute(accelerometer);
+                t1 = new Falling_stream();
+                t1.execute(accelerometer);
                 //Drucksensor
-                gyro = board.getModule(GyroBmi160.class);
+                /*gyro = board.getModule(GyroBmi160.class);
                 gyro.configure()
                         .odr(OutputDataRate.ODR_50_HZ)
                         .range(Range.FSR_2000)
                         .commit();
                 //t1 = new Barometer_stream();
-                Barometer_stream.execute((Runnable) gyro);
+                Barometer_stream.execute((Runnable) gyro);*/
             }
         });
         // configure stop button:
@@ -102,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 board.tearDown(); //shuts down the board -> saves energy
             }
         });
-        final Activity act = this;
+
 
         //Battery level Listener: (Akkuanzeige)
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
@@ -129,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Log.wtf("sensorstream", "Service disconnected.");
     }
 
-    //Bei Disconnet vom Service entbinden (Ressourcen freigeben)
+    //Bei Disconnect vom Service entbinden (Ressourcen freigeben)
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -164,8 +171,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });
 
-                /*// get Signal strength (RSSI): selbes Problem wie unten beschrieben
-                board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
+                // get Signal strength (RSSI): selbes Problem wie unten beschrieben
+                /**board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
                     @Override
                     public Void then(Task<Integer> task) throws Exception {
                         Log.i("sensorstream", "RSSI: " + task.getResult());
@@ -191,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 });
 
         //Manueller Verbindungsabbruch:
-        /*board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
+        /**board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
             public Void then(Task<Void> task) throws Exception {
                 Log.i("MainActivity", "Disconnected");
@@ -221,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             led.play();
         }
     }
-    /*private SensorEventListener mSensorEventListener = new SensorEventListener() {
+    /**private SensorEventListener mSensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
             Sensor sensor = sensorEvent.sensor;
@@ -238,7 +245,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 .commit();
                 Log.i("stream","gyroscope");
             }
-
         }
 
         @Override

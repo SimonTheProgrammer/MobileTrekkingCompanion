@@ -1,7 +1,10 @@
 package com.example.maurer.sensorstream;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.mbientlab.metawear.*;
 import com.mbientlab.metawear.Subscriber;
@@ -22,57 +25,67 @@ import bolts.Task;
  * nach der Koppelung mit dem Board kann man Daten von den Sensoren
  * kriegen.
  * => durch API von Hersteller
- * @link: 
+ * @link:
  */
 class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
+    private String dat;
 
     @Override
     protected Void doInBackground(Accelerometer... accelerometers) {
         //if (!isCancelled()) {
-try {
-    final Accelerometer accelerometer = accelerometers[0];
-    accelerometer.acceleration().start();
-    accelerometer.start();
 
-    accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
-        @Override
-        public void configure(RouteComponent source) {
-            /*source.stream(new Subscriber() {
-                @Override
-                public void apply(Data data, Object... env) {
-                    Log.i("Accelerometer",data.value(Acceleration.class).toString());
-                }=> FUNKTIONIERENDER TEIL (ROHDATEN)
-            });*/
-            //Filtern (Durchschnitt von 10 Messwerten
-            // - 1 = fallen
-            //(+)1 = erheben
-            source.map(Function1.RSS).lowpass((byte) 10).filter(ThresholdOutput.BINARY, 0.5f)
-                    .multicast()
-                    .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
-                @Override
-                public void apply(Data data, Object... env) {
-                    Log.i("Accelerometer", "FREEEFAALIIING");
-                }
-            }).to().filter(Comparison.EQ, 1).stream(new Subscriber() {
-                @Override
-                public void apply(Data data, Object... env) {
-                    Log.i("Accelerometer", "no freeefaaaalllinng");
-                }
-            }).end();
-        }
-    }).continueWith(new Continuation<Route, Void>() {
-        @Override
-        public Void then(Task<Route> task) throws Exception {
-            if (task.isFaulted()) {
-                Log.i("Accelerometer", "fail");
-            } else {
-                Log.i("Accelerometer", "success");
-                accelerometer.acceleration().start();
-                accelerometer.start();
+try {
+    while (true){
+        Thread.sleep(2000);//1 sek warten
+
+        final Accelerometer accelerometer = accelerometers[0];
+        accelerometer.acceleration().start();
+        accelerometer.start();
+
+        accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
+            @Override
+            public void configure(RouteComponent source) {
+                source.stream(new Subscriber() {
+                    @Override
+                    public void apply(Data data, Object... env) {
+                        dat = data.value(Acceleration.class).toString();
+                        Log.i("Accelerometer",dat);
+                    }//=> FUNKTIONIERENDER TEIL (ROHDATEN)
+                });
+                //Filtern (Durchschnitt von 10 Messwerten
+                // - 1 = fallen
+                //(+)1 = erheben
+                /**source.map(Function1.RSS).lowpass((byte) 10).filter(ThresholdOutput.BINARY, 0.5f)
+                        .multicast()
+                        .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
+                    @Override
+                    public void apply(Data data, Object... env) {
+                        Log.i("Accelerometer", "FREEEFAALIIING");
+                        state = "Falling";
+                    }
+                }).to().filter(Comparison.EQ, 1).stream(new Subscriber() {
+                    @Override
+                    public void apply(Data data, Object... env) {
+                        Log.i("Accelerometer", "no freeefaaaalllinng");
+                        state = "Not Falling";
+                    }
+                }).end();*/
+
             }
-            return null;
-        }
-    });
+        }).continueWith(new Continuation<Route, Void>() {
+            @Override
+            public Void then(Task<Route> task) throws Exception {
+                if (task.isFaulted()) {
+                    Log.i("Accelerometer", "fail");
+                } else {
+                    Log.i("Accelerometer", "success");
+                    accelerometer.acceleration().start();
+                    accelerometer.start();
+                }
+                return null;
+            }
+        });
+    }
     //}
         }catch (Exception e){
             e.printStackTrace();
@@ -80,8 +93,4 @@ try {
         return null;
     }
 
-        @Override
-        protected void onPostExecute (Void aVoid){
-            super.onPostExecute(aVoid);
-        }
 }
