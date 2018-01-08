@@ -21,6 +21,7 @@ import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.GyroBmi160.Range;
 import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
+import com.mbientlab.metawear.module.Temperature;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private GyroBmi160 gyro;
     private Accelerometer_stream t;
     private Falling_stream t1;
+    private Temperature_stream t2;
     final Activity act = this;
 
     /**
@@ -57,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 this, Context.BIND_AUTO_CREATE);
 
         //Turn on Bluetooth (if disabled)
-        new Bluetooth().execute();
+        new Bluetooth(act).execute();
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
@@ -77,10 +79,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .range(4f)
                         .commit();
                 //accelerometer.start();
-                t = new Accelerometer_stream(); //Rohdaten (DB)
-                t.execute(accelerometer);
-                t1 = new Falling_stream();
+                /*t = new Accelerometer_stream(); //Rohdaten (für DB)
+                t.execute(accelerometer);*/
+
+                t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
                 t1.execute(accelerometer);
+
+                t2 = new Temperature_stream();
+                final Temperature temperature = board.getModule(Temperature.class);
+                final Temperature.Sensor tempSensor = temperature.findSensors
+                        (Temperature.SensorType.PRESET_THERMISTOR)[0];
+                t2.execute(tempSensor);
+
                 //Drucksensor
                 /*gyro = board.getModule(GyroBmi160.class);
                 gyro.configure()
@@ -178,9 +188,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         Log.i("sensorstream", "RSSI: " + task.getResult());
                         return null;
                     }
-                });
+                });*/
                 //Device info: (funktioniert nicht)=> wird zu früh aufgerufen->bevor Board connected ist
-                board.readDeviceInformationAsync()
+                /**board.readDeviceInformationAsync()
                         .continueWith(new Continuation<DeviceInformation, Void>() {
                             @Override
                             public Void then(Task<DeviceInformation> task) throws Exception {
@@ -207,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         });*/
     }
 
-    //Aufruf, wenn Connection verloren geht; Anzeige durch TextView (fkt. nicht)
+    //Aufruf, wenn Connection verloren geht; Anzeige durch TextView
     private void Lost() {
         //Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
