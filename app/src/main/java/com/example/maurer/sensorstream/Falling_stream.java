@@ -66,7 +66,7 @@ public class Falling_stream extends AsyncTask<Accelerometer,Void,Void> {
                     @Override
                     public String then(Task<Route> task) throws Exception {
                         if (task.isFaulted()) {
-                            Log.i("Accelerometer", state+" and so");
+                            Log.i("Accelerometer", state+" and its not working");
                         } else {
                             Log.i("Accelerometer", state);
                             accelerometer.acceleration().start();
@@ -84,9 +84,9 @@ public class Falling_stream extends AsyncTask<Accelerometer,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-                final TextView v = (TextView) activity.findViewById(R.id.tv_RSSi);
+                /*final TextView v = (TextView) activity.findViewById(R.id.tv_RSSi);
                 Log.i("GO FOR IT",state);
-                v.setText(state+";");
+                v.setText(state+";");*/
                 /**REJECTED (?)
                  * YEEEEEEEET*/
     }

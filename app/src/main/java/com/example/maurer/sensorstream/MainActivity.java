@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 this, Context.BIND_AUTO_CREATE);
 
         //Turn on Bluetooth (if disabled)
-        new Bluetooth(act).execute();
+        //new Bluetooth(act).execute();
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Accelerometer (+fallen)
                  * Druck (mit Höhenmeter)
                  * Temperatur
+                 *Gyrosensor
+                 *Magnetometer
                  * [Rest folgt] */
                 //Beschleunigungsmesser
                 accelerometer = board.getModule(Accelerometer.class);
@@ -79,17 +81,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .range(4f)
                         .commit();
                 //accelerometer.start();
-                /*t = new Accelerometer_stream(); //Rohdaten (für DB)
-                t.execute(accelerometer);*/
+                t = new Accelerometer_stream(); //Rohdaten (für DB)
+                t.execute(accelerometer);//*/
 
-                t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
-                t1.execute(accelerometer);
+                /*t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
+                t1.execute(accelerometer);//*/
 
                 t2 = new Temperature_stream();
-                final Temperature temperature = board.getModule(Temperature.class);
+                /*final Temperature temperature = board.getModule(Temperature.class);
                 final Temperature.Sensor tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
-                t2.execute(tempSensor);
+                t2.execute(tempSensor);//*/
 
                 //Drucksensor
                 /*gyro = board.getModule(GyroBmi160.class);
@@ -107,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View view) {
                 Log.i("sensorstream","stop");
                 accelerometer.stop();
-                t.cancel(true);
+                t2.cancel(true); //MODIFY PLZ
                 /*accelerometer.stop();
                 accelerometer.acceleration().stop();*/
             }
@@ -125,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final TextView v = (TextView) findViewById(R.id.battery);
                 new BatteryListener(act).execute(board);
                 //Integer.toHexString(new BatteryListener().getBatteryLife());
                 Log.i("wtffff",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
@@ -170,12 +171,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 if (task.isFaulted()) {
                     Lost();
                 } else {
-                    Log.i("Board", "Connected to " + macAddr);
-                    Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
-                    playLed(Led.Color.GREEN); //Output for user
-                    TextView v = (TextView) findViewById(R.id.Con_status);
-                    v.setTextColor(getResources().getColor(R.color.accepted));
-                    v.setText("Connection succeded:");
+                    Succeed(macAddr);
                 }
                 return null;
             }
@@ -215,6 +211,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });*/
+    }
+
+    private void Succeed(String macAddr) {
+        Log.i("Board", "Connected to " + macAddr);
+        Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
+        playLed(Led.Color.GREEN); //Output for user
+        TextView v = (TextView) findViewById(R.id.Con_status);
+        v.setTextColor(getResources().getColor(R.color.accepted));
+        String display = "Connection succeded";
+        v.setText(display);
     }
 
     //Aufruf, wenn Connection verloren geht; Anzeige durch TextView

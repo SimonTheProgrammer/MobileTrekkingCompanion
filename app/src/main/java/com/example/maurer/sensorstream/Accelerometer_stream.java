@@ -36,12 +36,9 @@ class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
 
 try {
     while (true){
-        Thread.sleep(2000);//1 sek warten
-
         final Accelerometer accelerometer = accelerometers[0];
         accelerometer.acceleration().start();
         accelerometer.start();
-
         accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
             @Override
             public void configure(RouteComponent source) {
@@ -50,27 +47,8 @@ try {
                     public void apply(Data data, Object... env) {
                         dat = data.value(Acceleration.class).toString();
                         Log.i("Accelerometer",dat);
-                    }//=> FUNKTIONIERENDER TEIL (ROHDATEN)
+                    }                       /**=> FUNKTIONIERENDER TEIL (ROHDATEN)*/
                 });
-                //Filtern (Durchschnitt von 10 Messwerten
-                // - 1 = fallen
-                //(+)1 = erheben
-                /**source.map(Function1.RSS).lowpass((byte) 10).filter(ThresholdOutput.BINARY, 0.5f)
-                        .multicast()
-                        .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
-                    @Override
-                    public void apply(Data data, Object... env) {
-                        Log.i("Accelerometer", "FREEEFAALIIING");
-                        state = "Falling";
-                    }
-                }).to().filter(Comparison.EQ, 1).stream(new Subscriber() {
-                    @Override
-                    public void apply(Data data, Object... env) {
-                        Log.i("Accelerometer", "no freeefaaaalllinng");
-                        state = "Not Falling";
-                    }
-                }).end();*/
-
             }
         }).continueWith(new Continuation<Route, Void>() {
             @Override
@@ -87,10 +65,11 @@ try {
         });
     }
     //}
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
 
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+    return null;
+
+    }
 }
