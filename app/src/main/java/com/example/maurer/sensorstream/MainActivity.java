@@ -77,8 +77,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 //Beschleunigungsmesser
                 accelerometer = board.getModule(Accelerometer.class);
                 accelerometer.configure()
-                        .odr(5) //Sampling frequency
-                        .range(4f)
+                        .odr(1f) //Sampling frequency
+                        .range(4f) //Range: +/-4g
                         .commit();
                 //accelerometer.start();
                 t = new Accelerometer_stream(); //Rohdaten (für DB)
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 Barometer_stream.execute((Runnable) gyro);*/
             }
         });
+
         // configure stop button:
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
