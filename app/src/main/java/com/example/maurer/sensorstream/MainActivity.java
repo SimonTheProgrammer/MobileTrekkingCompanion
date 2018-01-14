@@ -17,6 +17,7 @@ import com.mbientlab.metawear.DeviceInformation;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.module.Accelerometer;
+import com.mbientlab.metawear.module.BarometerBosch;
 import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.GyroBmi160.Range;
 import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
@@ -31,7 +32,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
     private Accelerometer accelerometer;
-    private GyroBmi160 gyro;
     private Accelerometer_stream t;
     private Falling_stream t1;
     private Temperature_stream t2;
@@ -93,14 +93,17 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
                 t2.execute(tempSensor);//*/
 
-                //Drucksensor
-                /*gyro = board.getModule(GyroBmi160.class);
-                gyro.configure()
-                        .odr(OutputDataRate.ODR_50_HZ)
-                        .range(Range.FSR_2000)
+                //Drucksensor: tot
+                /*BarometerBosch baro = board.getModule(BarometerBosch.class);
+                baro.configure()
+                        .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
+                        .pressureOversampling(BarometerBosch.OversamplingMode.LOW_POWER)
+                        .standbyTime(4f)
                         .commit();
                 //t1 = new Barometer_stream();
-                Barometer_stream.execute((Runnable) gyro);*/
+                Barometer_stream.execute((Runnable) baro);*/
+
+
             }
         });
 
