@@ -24,45 +24,48 @@ public class Barometer_stream extends AsyncTask<BarometerBosch,Void,Void>{
     protected Void doInBackground(BarometerBosch... baro) {
         //ArrayIndexOutOfBoundsException
         try{
-            final BarometerBosch barometerBosch = baro[0];
-            //Pressure Data:
-            barometerBosch.pressure().addRouteAsync(new RouteBuilder() {
-                @Override
-                public void configure(RouteComponent source) {
-                    source.stream(new Subscriber() {
-                        @Override
-                        public void apply(Data data, Object... env) {
-                            Log.i("Barometer_stream", "Pressure (Pa) = " + data.value(Float.class));
-                        }
-                    });
-                }
-            }).continueWith(new Continuation<Route, Void>() {
-                @Override
-                public Void then(Task<Route> task) throws Exception {
-                    barometerBosch.start();
-                    return null;
-                }
-            });
+            while(true) {
+                Thread.sleep(3000);
+                final BarometerBosch barometerBosch = baro[0];
+                //Pressure Data:
+                barometerBosch.pressure().addRouteAsync(new RouteBuilder() {
+                    @Override
+                    public void configure(RouteComponent source) {
+                        source.stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                Log.i("Barometer_stream", "Pressure (Pa) = " + data.value(Float.class));
+                            }
+                        });
+                    }
+                }).continueWith(new Continuation<Route, Void>() {
+                    @Override
+                    public Void then(Task<Route> task) throws Exception {
+                        barometerBosch.start();
+                        return null;
+                    }
+                });
 
-            //Höhenmeter:
-            barometerBosch.altitude().addRouteAsync(new RouteBuilder() {
-                @Override
-                public void configure(RouteComponent source) {
-                    source.stream(new Subscriber() {
-                        @Override
-                        public void apply(Data data, Object... env) {
-                            Log.i("MainActivity", "Altitude (m) = " + data.value(Float.class));
-                        }
-                    });
-                }
-            }).continueWith(new Continuation<Route, Void>() {
-                @Override
-                public Void then(Task<Route> task) throws Exception {
-                    barometerBosch.altitude().start();
-                    barometerBosch.start();
-                    return null;
-                }
-            });
+                //Höhenmeter:
+                barometerBosch.altitude().addRouteAsync(new RouteBuilder() {
+                    @Override
+                    public void configure(RouteComponent source) {
+                        source.stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                Log.i("MainActivity", "Altitude (m) = " + data.value(Float.class));
+                            }
+                        });
+                    }
+                }).continueWith(new Continuation<Route, Void>() {
+                    @Override
+                    public Void then(Task<Route> task) throws Exception {
+                        barometerBosch.altitude().start();
+                        barometerBosch.start();
+                        return null;
+                    }
+                });
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

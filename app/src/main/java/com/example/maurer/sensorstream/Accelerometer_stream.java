@@ -34,46 +34,45 @@ class Accelerometer_stream extends AsyncTask<Accelerometer,Void,Void> {
     @Override
     protected Void doInBackground(Accelerometer... accelerometers) {
         //if (!isCancelled()) {
-
-try {
-    while (Slow_down()){
-        final Accelerometer accelerometer = accelerometers[0];
-        accelerometer.acceleration().start();
-        accelerometer.start();
-        accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
-            @Override
-            public void configure(RouteComponent source) {
-                source.stream(new Subscriber() {
+        try {
+            while (Slow_down()){
+                final Accelerometer accelerometer = accelerometers[0];
+                accelerometer.acceleration().start();
+                accelerometer.start();
+                accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
                     @Override
-                    public void apply(Data data, Object... env) {
-                        dat = data.value(Acceleration.class).toString();
-                        list.add(dat);
-                    }                       /**=> FUNKTIONIERENDER TEIL (ROHDATEN)*/
+                    public void configure(RouteComponent source) {
+                        source.stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                dat = data.value(Acceleration.class).toString();
+                                list.add(dat);
+                            }                       /**=> FUNKTIONIERENDER TEIL (ROHDATEN)*/
+                        });
+                    }
+                }).continueWith(new Continuation<Route, Void>() {
+                    @Override
+                    public Void then(Task<Route> task) throws Exception {
+                        if (task.isFaulted()) {
+                            Log.i("Accelerometer", "fail");
+                        } else {
+                            Log.i("Accelerometer", "success");
+                            if (list.size()>300){
+                                Fetch(list);
+                            }
+                            accelerometer.acceleration().start();
+                            accelerometer.start();
+                        }
+                        return null;
+                    }
                 });
             }
-        }).continueWith(new Continuation<Route, Void>() {
-            @Override
-            public Void then(Task<Route> task) throws Exception {
-                if (task.isFaulted()) {
-                    Log.i("Accelerometer", "fail");
-                } else {
-                    Log.i("Accelerometer", "success");
-                    if (list.size()>300){
-                        Fetch(list);
-                    }
-                    accelerometer.acceleration().start();
-                    accelerometer.start();
-                }
-                return null;
-            }
-        });
-    }
-    //}
+            //}
 
-    }catch (Exception e){
-        e.printStackTrace();
-    }
-    return null;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return null;
     }
 
     private boolean Slow_down() {

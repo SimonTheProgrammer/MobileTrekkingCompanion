@@ -22,6 +22,7 @@ import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.GyroBmi160.Range;
 import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
+import com.mbientlab.metawear.module.MagnetometerBmm150;
 import com.mbientlab.metawear.module.Temperature;
 
 import bolts.Continuation;
@@ -32,9 +33,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
     private Accelerometer accelerometer;
+    private BarometerBosch baro;
     private Accelerometer_stream t;
     private Falling_stream t1;
     private Temperature_stream t2;
+    private Gyrosensor_stream t3;
+    private Magnetometer_stream t4;
+    private GyroBmi160 gyro;
+    private MagnetometerBmm150 magnet;
     final Activity act = this;
 
     /**
@@ -71,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Accelerometer (+fallen)
                  * Druck (mit Höhenmeter)
                  * Temperatur
-                 *Gyrosensor
+                 * Gyrosensor
                  *Magnetometer
                  * [Rest folgt] */
                 //Beschleunigungsmesser
@@ -81,21 +87,21 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .range(4f) //Range: +/-4g
                         .commit();
                 //accelerometer.start();
-                t = new Accelerometer_stream(); //Rohdaten (für DB)
+                /*t = new Accelerometer_stream(); //Rohdaten (für DB)
                 t.execute(accelerometer);//*/
 
                 /*t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
                 t1.execute(accelerometer);//*/
 
                 t2 = new Temperature_stream();
-                /*final Temperature temperature = board.getModule(Temperature.class);
+                final Temperature temperature = board.getModule(Temperature.class);
                 final Temperature.Sensor tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
                 t2.execute(tempSensor);//*/
 
                 //Drucksensor: tot
-                /*BarometerBosch baro = board.getModule(BarometerBosch.class);
-                baro.configure()
+                baro = board.getModule(BarometerBosch.class);
+                /*baro.configure()
                         .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
                         .pressureOversampling(BarometerBosch.OversamplingMode.LOW_POWER)
                         .standbyTime(4f)
@@ -103,7 +109,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 //t1 = new Barometer_stream();
                 Barometer_stream.execute((Runnable) baro);*/
 
+                //Gyrosensor (Lagesensor): keine Daten
+                gyro = board.getModule(GyroBmi160.class);
+                gyro.configure()
+                        .range(Range.FSR_2000)
+                        .odr(OutputDataRate.ODR_25_HZ)
+                        .commit();//*/
+                Log.i("MainActivity","start Thread");
+                t3 = new Gyrosensor_stream();
+                t3.execute(gyro);
 
+                //Magnetometer (Magnetfeld): keine Daten
+                magnet = board.getModule(MagnetometerBmm150.class);
+                magnet.usePreset(MagnetometerBmm150.Preset.REGULAR);
+                /*ODR: 10Hz
+                * Average Current: 0.5mA
+                * Noise: 0.6 myrkoTesla*/
+                t4 = new Magnetometer_stream();
+                t4.execute(magnet);
             }
         });
 
@@ -112,8 +135,14 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void onClick(View view) {
                 Log.i("sensorstream","stop");
-                accelerometer.stop();
-                t2.cancel(true); //MODIFY PLZ
+                accelerometer.stop(); //t
+                //t1.cancel(true);
+                gyro.stop();
+                magnet.stop();
+                baro.stop();
+                t2.cancel(true);
+                t3.cancel(true);
+                t4.cancel(true);//MODIFY PLZ
                 /*accelerometer.stop();
                 accelerometer.acceleration().stop();*/
             }

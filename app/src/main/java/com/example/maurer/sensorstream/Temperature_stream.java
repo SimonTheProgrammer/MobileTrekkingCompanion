@@ -25,8 +25,8 @@ public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> 
     @Override
     protected Void doInBackground(Temperature.Sensor... sensors) {
         try {
+            tempSensor = sensors[0];
             while (true){
-                tempSensor = sensors[0];
                 tempSensor.addRouteAsync(new RouteBuilder() {
                     @Override
                     public void configure(RouteComponent source) {

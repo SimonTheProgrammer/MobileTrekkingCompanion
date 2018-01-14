@@ -87,7 +87,6 @@ public class Falling_stream extends AsyncTask<Accelerometer,Void,Void> {
                 /*final TextView v = (TextView) activity.findViewById(R.id.tv_RSSi);
                 Log.i("GO FOR IT",state);
                 v.setText(state+";");*/
-                /**REJECTED (?)
-                 * YEEEEEEEET*/
+                /**REJECTED*/
     }
 }
