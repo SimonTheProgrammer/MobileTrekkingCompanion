@@ -21,12 +21,20 @@ import bolts.Task;
 public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> {
     Temperature.Sensor tempSensor;
     LinkedList list = new LinkedList();
+    volatile boolean run = true;
+
+    @Override
+    protected void onCancelled(Void aVoid) {
+        super.onCancelled(aVoid);
+        Log.i("TempSensor","PLZ STAHP");
+    }
 
     @Override
     protected Void doInBackground(Temperature.Sensor... sensors) {
         try {
             tempSensor = sensors[0];
-            while (true){
+            while (run){
+                if (isCancelled()) break;
                 tempSensor.addRouteAsync(new RouteBuilder() {
                     @Override
                     public void configure(RouteComponent source) {
@@ -40,13 +48,19 @@ public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> 
                 }).continueWith(new Continuation<Route, Void>() {
                     @Override
                     public Void then(Task<Route> task) throws Exception {
-                        tempSensor.read();
-
-                        Log.i("sensorstream", "(C): "+list.getLast());
+                        String runner = "";
+                        if (run) {
+                            tempSensor.read();
+                            Log.i("sensorstream: ", "(C): " + list.getLast()+": ");
+                        }
+                        else {
+                            //Thread.sleep(999999999); //999.999s warten = 11,5 Tage
+                            return null;
+                        }
                         try {
-                            Thread.sleep(20000); //alle 20s
+                            Thread.sleep(10000); //alle 10s
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            //e.printStackTrace();
                         }
                         return null;
                     }

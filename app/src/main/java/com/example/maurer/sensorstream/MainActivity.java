@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private MetaWearBoard board;
     private Accelerometer accelerometer;
     private BarometerBosch baro;
+    private Temperature.Sensor tempSensor;
     private Accelerometer_stream t;
     private Falling_stream t1;
     private Temperature_stream t2;
@@ -95,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
                 t2 = new Temperature_stream();
                 final Temperature temperature = board.getModule(Temperature.class);
-                final Temperature.Sensor tempSensor = temperature.findSensors
+                tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
                 t2.execute(tempSensor);//*/
 
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 magnet.usePreset(MagnetometerBmm150.Preset.REGULAR);
                 /*ODR: 10Hz
                 * Average Current: 0.5mA
-                * Noise: 0.6 myrkoTesla*/
+                * Noise: 0.6 mykroTesla*/
                 t4 = new Magnetometer_stream();
                 t4.execute(magnet);
             }
@@ -141,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 magnet.stop();
                 baro.stop();
                 t2.cancel(true);
+                t2.run = false;
                 t3.cancel(true);
                 t4.cancel(true);//MODIFY PLZ
                 /*accelerometer.stop();
