@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mbientlab.metawear.AsyncDataProducer;
 import com.mbientlab.metawear.DeviceInformation;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.android.BtleService;
@@ -25,6 +26,8 @@ import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
 import com.mbientlab.metawear.module.MagnetometerBmm150;
 import com.mbientlab.metawear.module.Temperature;
+
+import java.io.IOException;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -39,9 +42,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private Accelerometer_stream t;
     private Falling_stream t1;
     private Temperature_stream t2;
-    private Gyrosensor_stream t3;
     private Magnetometer_stream t4;
-    private GyroBmi160 gyro;
     private MagnetometerBmm150 magnet;
     final Activity act = this;
 
@@ -88,18 +89,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .odr(1f) //Sampling frequency
                         .range(4f) //Range: +/-4g
                         .commit();
-                //accelerometer.start();
-                /*t = new Accelerometer_stream(); //Rohdaten (für DB)
+                accelerometer.start();
+                t = new Accelerometer_stream(act); //Rohdaten (für DB)
                 t.execute(accelerometer);//*/
 
                 /*t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
                 t1.execute(accelerometer);//*/
 
-                t2 = new Temperature_stream();
+                t2 = new Temperature_stream(act);
                 final Temperature temperature = board.getModule(Temperature.class);
                 tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
-                t2.execute(tempSensor);//*/
+                /*t2.execute(tempSensor);//*/
 
                 //Drucksensor: tot
                 baro = board.getModule(BarometerBosch.class);
@@ -110,16 +111,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         .commit();
                 //t1 = new Barometer_stream();
                 Barometer_stream.execute((Runnable) baro);*/
-
-                //Gyrosensor (Lagesensor): keine Daten
-                gyro = board.getModule(GyroBmi160.class);
-                gyro.configure()
-                        .range(Range.FSR_2000)
-                        .odr(OutputDataRate.ODR_25_HZ)
-                        .commit();//*/
-                Log.i("MainActivity","start Thread");
-                t3 = new Gyrosensor_stream();
-                t3.execute(gyro);
 
                 //Magnetometer (Magnetfeld): keine Daten
                 magnet = board.getModule(MagnetometerBmm150.class);
@@ -139,12 +130,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 Log.i("sensorstream","stop");
                 accelerometer.stop(); //t
                 //t1.cancel(true);
-                gyro.stop();
                 magnet.stop();
                 baro.stop();
                 t2.cancel(true);
                 t2.run = false;
-                t3.cancel(true);
                 t4.cancel(true);//MODIFY PLZ
                 /*accelerometer.stop();
                 accelerometer.acceleration().stop();*/
@@ -154,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                board.tearDown(); //shuts down the board -> saves energy
+                board.tearDown(); //removes routes-> resources
             }
         });
 
