@@ -80,23 +80,29 @@ public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
     }
 
     public int getBatteryLife(){
-        board.readBatteryLevelAsync()
-                .continueWith(new Continuation<Byte, Object>() {
-                    @Override
-                    public Object then(Task<Byte> task) throws Exception {
-                        Log.i("Battery", "Battery level: "+task.getResult()+"%");
-                        batter = ((int)task.getResult()) & 0xFF;
-                        if (batter < 100){
-                            list.add(format.format(calendar.getTime())); //[0]
-                            list.add(batter); //[1]
-                            Log.i("Battery","Checking...");
-                            //v.setText("Checking...");
-                        } else
-                            //v.setText(batter+"%");
-                            lev = batter;
-                        return batter;
-                    }
-                });
-        return lev & 0xFF;
+        if (board != null) {
+            board.readBatteryLevelAsync()
+                    .continueWith(new Continuation<Byte, Object>() {
+                        @Override
+                        public Object then(Task<Byte> task) throws Exception {
+                            Log.i("Battery", "Battery level: " + task.getResult() + "%");
+                            batter = ((int) task.getResult()) & 0xFF;
+                            if (batter < 100) {
+                                list.add(format.format(calendar.getTime())); //[0]
+                                list.add(batter); //[1]
+                                Log.i("Battery", "Checking...");
+                                //v.setText("Checking...");
+                            } else
+                                //v.setText(batter+"%");
+                                lev = batter;
+                            return batter;
+                        }
+                    });
+            return lev & 0xFF;
+        }
+        else{
+            Log.i("Board","null");
+            return 0;
+        }
     }
 }

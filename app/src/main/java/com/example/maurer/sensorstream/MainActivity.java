@@ -15,9 +15,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mbientlab.metawear.AsyncDataProducer;
+import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.DeviceInformation;
 import com.mbientlab.metawear.MetaWearBoard;
+import com.mbientlab.metawear.Route;
+import com.mbientlab.metawear.Subscriber;
 import com.mbientlab.metawear.android.BtleService;
+import com.mbientlab.metawear.builder.RouteBuilder;
+import com.mbientlab.metawear.builder.RouteComponent;
+import com.mbientlab.metawear.data.MagneticField;
 import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.BarometerBosch;
 import com.mbientlab.metawear.module.GyroBmi160;
@@ -25,6 +31,7 @@ import com.mbientlab.metawear.module.GyroBmi160.Range;
 import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
 import com.mbientlab.metawear.module.MagnetometerBmm150;
+import com.mbientlab.metawear.module.SensorFusionBosch;
 import com.mbientlab.metawear.module.Temperature;
 
 import java.io.IOException;
@@ -44,7 +51,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private Temperature_stream t2;
     private Magnetometer_stream t4;
     private MagnetometerBmm150 magnet;
+    private SensorFusionBosch sensorFusion;
     final Activity act = this;
+    String address;
 
     /**
         @author: Simon Maurer
@@ -66,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         getApplicationContext().bindService(new Intent(this, BtleService.class),
                 this, Context.BIND_AUTO_CREATE);
+
+        Intent intent = getIntent();
+        address = intent.getStringExtra("Address"); //MAC ADDRESS
 
         //Turn on Bluetooth (if disabled)
         //new Bluetooth(act).execute();
@@ -120,6 +132,30 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 * Noise: 0.6 mykroTesla*/
                 t4 = new Magnetometer_stream();
                 t4.execute(magnet);
+
+                sensorFusion = board.getModule(SensorFusionBosch.class);
+                sensorFusion.configure()
+                        .mode(SensorFusionBosch.Mode.COMPASS)
+                        .commit();
+
+                /*sensorFusion.correctedMagneticField().addRouteAsync(new RouteBuilder() {
+                    @Override
+                    public void configure(RouteComponent source) {
+                        source.stream(new Subscriber() {
+                            @Override
+                            public void apply(Data data, Object... env) {
+                                Log.i("Sensorfusion","[T]: "+data.value(MagneticField.class));
+                            }
+                        });
+                    }
+                }).continueWith(new Continuation<Route, Void>() {
+                    @Override
+                    public Void then(Task<Route> task) throws Exception {
+                        sensorFusion.correctedMagneticField().start();
+                        sensorFusion.start();
+                        return null;
+                    }
+                });*/
             }
         });
 
@@ -135,8 +171,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 t2.cancel(true);
                 t2.run = false;
                 t4.cancel(true);//MODIFY PLZ
-                /*accelerometer.stop();
-                accelerometer.acceleration().stop();*/
+
+                //DB anzeigen lassen
+
             }
         });
         //configure reset button:
@@ -154,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View view) {
                 new BatteryListener(act).execute(board);
                 //Integer.toHexString(new BatteryListener().getBatteryLife());
-                Log.i("wtffff",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
+                Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
             }
         });
     }
@@ -164,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         serviceBinder = (BtleService.LocalBinder) iBinder;
         Log.wtf("sensorstream","Service Connected");
 
-        retrieveBoard("C6:EE:AA:23:E4:4F"); //Board Simon (+Drucksensor)
+        retrieveBoard(address); //Board mit MAC-Adresse ansprechen
     }
 
     @Override
