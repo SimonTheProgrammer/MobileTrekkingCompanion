@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_logging);
 
+        this.setTitle("Neue Verbindung");
         if (mBluetoothAdapter == null){
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
             dlgAlert.setMessage("Gerät unterstützt kein Bluetooth!");

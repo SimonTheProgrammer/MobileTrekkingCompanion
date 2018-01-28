@@ -14,10 +14,12 @@
         <service android:name="com.mbientlab.metawear.android.BtleService"/>
         <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
         <uses-permission android:name="android.permission.BLUETOOTH"/>
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+                  android:screenOrientation="portrait">
 
         </activity>
-        <activity android:name=".Scanner.MainActivity">
+        <activity android:name=".Scanner.MainActivity"
+                  android:screenOrientation="portrait">
             <intent-filter>
             <action android:name="android.intent.action.MAIN" />
             <category android:name="android.intent.category.LAUNCHER" />

@@ -79,8 +79,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Intent intent = getIntent();
         address = intent.getStringExtra("Address"); //MAC ADDRESS
 
-        //Turn on Bluetooth (if disabled)
-        //new Bluetooth(act).execute();
+        this.setTitle("MobileTrekkingCompanion");
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
