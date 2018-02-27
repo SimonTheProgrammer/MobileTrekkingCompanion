@@ -29,7 +29,7 @@ public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> 
     LinkedList list = new LinkedList();
     volatile boolean run = true;
     Activity activity;
-    int grab = 10000; //Wartezeit bis neue Daten
+    int grab = 5000; //Wartezeit bis neue Daten
 
     public Temperature_stream(Activity act) {
         this.activity = act;
@@ -85,7 +85,8 @@ public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> 
             }
         }catch (Exception e){
             e.printStackTrace();
-        }return null;
+        }
+        return null;
     }
 
     private void Fetch(LinkedList list) {
@@ -105,12 +106,5 @@ public class Temperature_stream extends AsyncTask<Temperature.Sensor,Void,Void> 
             Log.i("Liste", list.get(i) +"");
             list.remove(i);
         }
-        list = new LinkedList();
     }
 }
-
-
-
-
-/**backback
- * Rucksack*/

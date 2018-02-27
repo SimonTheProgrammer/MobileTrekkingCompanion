@@ -6,7 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
 import com.mbientlab.metawear.MetaWearBoard;
@@ -21,13 +23,13 @@ import bolts.Task;
 /**
  * Created by Maurer on 28.11.2017.
  * @author: Akkuanzeige für Board (funktioniert nicht beim 1. Klicken)
+ * @Udate: fkt. bei 1.Klick=> dauert aber etwas bis zur Anzeige im Textview (ca. 12s)
  */
 public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
     private MetaWearBoard board;
     LinkedList list = new LinkedList();
     private Activity activity;
     int batter;
-    int lev = 0;
     final Calendar calendar = Calendar.getInstance();
     final SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
@@ -39,13 +41,9 @@ public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
     @Override
     protected Void doInBackground(MetaWearBoard... metaWearBoards) {
         board = metaWearBoards[0]; //retrieve Board
-        batter = getBatteryLife();
+        //batter =
+                getBatteryLife();
 
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if (list.size()>100)
             Fetch(list);
         return null;
@@ -60,7 +58,7 @@ public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
             else //ungerade
                 cv.put("value", (int)list.get(i));
             SQLiteDatabase write = db.getWritableDatabase();
-            write.insertWithOnConflict("Battery", null, cv, SQLiteDatabase.CONFLICT_FAIL);
+            write.insertWithOnConflict("Battery", null, cv, SQLiteDatabase.CONFLICT_IGNORE); //doesn´t write null in DB
         }
 
         //Liste leeren:
@@ -68,41 +66,39 @@ public class BatteryListener extends AsyncTask<MetaWearBoard,Void,Void>{
             Log.i("Liste", list.get(i) +"");
             list.remove(i);
         }
-        list = new LinkedList();
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        final TextView v = (TextView) activity.findViewById(R.id.battery);
-        Log.i("GO FOR IT",batter+"%");
-        v.setText(batter+"%");
+        activity.findViewById(R.id.battery).performClick();
     }
 
-    public int getBatteryLife(){
+    public void getBatteryLife(){
         if (board != null) {
             board.readBatteryLevelAsync()
                     .continueWith(new Continuation<Byte, Object>() {
                         @Override
                         public Object then(Task<Byte> task) throws Exception {
                             Log.i("Battery", "Battery level: " + task.getResult() + "%");
+                            //this is were it works
                             batter = ((int) task.getResult()) & 0xFF;
-                            if (batter < 100) {
+                            TextView v = (TextView) activity.findViewById(R.id.battery);
+                            if (batter <= 100) {
                                 list.add(format.format(calendar.getTime())); //[0]
                                 list.add(batter); //[1]
                                 Log.i("Battery", "Checking...");
-                                //v.setText("Checking...");
-                            } else
-                                //v.setText(batter+"%");
-                                lev = batter;
+                                Toast.makeText(activity,"Battery: "+task.getResult(),Toast.LENGTH_SHORT);
+                                v.setText("Checking...");
+                            }
                             return batter;
                         }
                     });
-            return lev & 0xFF;
+            //return lev & 0xFF;
         }
         else{
-            Log.i("Board","null");
-            return 0;
+            //Log.i("Board","null");
+            //return 0;
         }
     }
 }

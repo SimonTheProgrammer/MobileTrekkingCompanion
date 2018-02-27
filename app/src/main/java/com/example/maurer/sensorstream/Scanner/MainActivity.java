@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_logging);
 
-        this.setTitle("Neue Verbindung");
+        this.setTitle("Gerät verbinden");
         if (mBluetoothAdapter == null){
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
             dlgAlert.setMessage("Gerät unterstützt kein Bluetooth!");
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
                 final Device_Information selected = (Device_Information) adapterView.getItemAtPosition(i);
                 Log.i("Click",selected.toString());
                 //ContextCompat.getColor(context, R.color.right);
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("Device_selected","start coding here");
                         Intent intent = new Intent(a, com.example.maurer.sensorstream.MainActivity.class);
                         intent.putExtra("Address",selected.getAddress());
+                        unregisterReceiver(mReceiver);
                         startActivity(intent);
                     }
                 });
@@ -131,9 +132,9 @@ public class MainActivity extends AppCompatActivity {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
                 int type = device.getType();
-                BluetoothClass clas = device.getBluetoothClass();
+                BluetoothClass bclass = device.getBluetoothClass();
 
-                Device_Information d = new Device_Information(deviceHardwareAddress,clas,deviceName,type);
+                Device_Information d = new Device_Information(deviceHardwareAddress,bclass,deviceName,type);
                 Log.i("New Device",deviceHardwareAddress + "; "+deviceName);
                 addItems(d);
             }

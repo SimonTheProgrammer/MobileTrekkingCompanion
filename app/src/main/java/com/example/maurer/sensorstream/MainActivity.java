@@ -25,6 +25,7 @@ import com.mbientlab.metawear.builder.RouteBuilder;
 import com.mbientlab.metawear.builder.RouteComponent;
 import com.mbientlab.metawear.data.MagneticField;
 import com.mbientlab.metawear.module.Accelerometer;
+import com.mbientlab.metawear.module.BarometerBmp280;
 import com.mbientlab.metawear.module.BarometerBosch;
 import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.GyroBmi160.Range;
@@ -44,15 +45,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
     private Accelerometer accelerometer;
-    private BarometerBosch baro;
     private Temperature.Sensor tempSensor;
-    private Accelerometer_stream t;
-    private Falling_stream t1;
+    private Falling_stream1 t1;
     private Temperature_stream t2;
-    private Magnetometer_stream t4;
-    private MagnetometerBmm150 magnet;
-    private SensorFusionBosch sensorFusion;
-    final Activity act = this;
+    private Gyroscope_stream t5;
+    private GyroBmi160 gyro; //TESTEN
+    private BarometerBmp280 baro;
+    Activity act = this;
     String address;
 
     /**
@@ -78,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
         Intent intent = getIntent();
         address = intent.getStringExtra("Address"); //MAC ADDRESS
-
         this.setTitle("MobileTrekkingCompanion");
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
@@ -91,70 +89,47 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Accelerometer (+fallen)
                  * Druck (mit Höhenmeter)
                  * Temperatur
-                 * Gyrosensor
-                 *Magnetometer
-                 * [Rest folgt] */
-                //Beschleunigungsmesser
+                 *Gyrosensor
+                 * Magnetometer*/
+
                 accelerometer = board.getModule(Accelerometer.class);
                 accelerometer.configure()
                         .odr(1f) //Sampling frequency
                         .range(4f) //Range: +/-4g
                         .commit();
                 accelerometer.start();
-                t = new Accelerometer_stream(act); //Rohdaten (für DB)
-                t.execute(accelerometer);//*/
-
-                /*t1 = new Falling_stream(); //fallen -> ja oder nein (2s)
-                t1.execute(accelerometer);//*/
+                t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
+                t1.start();//*/
 
                 t2 = new Temperature_stream(act);
                 final Temperature temperature = board.getModule(Temperature.class);
                 tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
-                /*t2.execute(tempSensor);//*/
+                Log.i("MainActivity","start Temp");
+                t2.execute(tempSensor);//*/
 
-                //Drucksensor: tot
-                baro = board.getModule(BarometerBosch.class);
-                /*baro.configure()
+                //Drucksensor
+                baro = board.getModule(BarometerBmp280.class);
+                baro.configure()
                         .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
                         .pressureOversampling(BarometerBosch.OversamplingMode.LOW_POWER)
                         .standbyTime(4f)
                         .commit();
-                //t1 = new Barometer_stream();
-                Barometer_stream.execute((Runnable) baro);*/
+                baro.start();
+                Log.i("MainActivity","start Baro");
+                Barometer_stream1 bar = new Barometer_stream1(act,baro);
+                bar.start();
 
-                //Magnetometer (Magnetfeld): keine Daten
-                magnet = board.getModule(MagnetometerBmm150.class);
-                magnet.usePreset(MagnetometerBmm150.Preset.REGULAR);
-                /*ODR: 10Hz
-                * Average Current: 0.5mA
-                * Noise: 0.6 mykroTesla*/
-                t4 = new Magnetometer_stream();
-                t4.execute(magnet);
-
-                sensorFusion = board.getModule(SensorFusionBosch.class);
-                sensorFusion.configure()
-                        .mode(SensorFusionBosch.Mode.COMPASS)
+                /*gyro = board.getModule(GyroBmi160.class);
+                gyro.configure()
+                        .odr(OutputDataRate.ODR_25_HZ)
+                        .range(Range.FSR_500)
                         .commit();
+                t5 = new Gyroscope_stream();
+                t5.execute(gyro);//*/
 
-                /*sensorFusion.correctedMagneticField().addRouteAsync(new RouteBuilder() {
-                    @Override
-                    public void configure(RouteComponent source) {
-                        source.stream(new Subscriber() {
-                            @Override
-                            public void apply(Data data, Object... env) {
-                                Log.i("Sensorfusion","[T]: "+data.value(MagneticField.class));
-                            }
-                        });
-                    }
-                }).continueWith(new Continuation<Route, Void>() {
-                    @Override
-                    public Void then(Task<Route> task) throws Exception {
-                        sensorFusion.correctedMagneticField().start();
-                        sensorFusion.start();
-                        return null;
-                    }
-                });*/
+                Accelerometer_stream1 acc = new Accelerometer_stream1(accelerometer, act);
+                acc.start();//*/
             }
         });
 
@@ -163,34 +138,51 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void onClick(View view) {
                 Log.i("sensorstream","stop");
-                accelerometer.stop(); //t
-                //t1.cancel(true);
-                magnet.stop();
-                baro.stop();
-                t2.cancel(true);
-                t2.run = false;
-                t4.cancel(true);//MODIFY PLZ
+                try {
+                    accelerometer.stop(); //t
+                    baro.stop();
+                    t2.cancel(true);
+                    t5.cancel(true);
+                }catch(Exception e){
+                    Toast.makeText(act,"(1-7) Thread(s) konnte(n) nicht beendet werden!", Toast.LENGTH_LONG).show();
+                }
+                try {
+                    Intent intent = new Intent(act, com.example.maurer.sensorstream.DB.DB_Anzeige.class);
+                    startActivity(intent);
+
+                }catch (NullPointerException ex){
+                    Toast.makeText(act,"NullPointer Exception", Toast.LENGTH_SHORT).show();
+                }
 
                 //DB anzeigen lassen
+                /**
+                 * neues Intent designen, welches die DB-Einträge anzeigt
+                    */
+            }
+        });
 
+        findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BatteryListener1 buttz = new BatteryListener1(act,board);
+                buttz.start();
+                Log.i("Main","ClickListener");
+                //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
             }
         });
         //configure reset button:
         findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                board.tearDown(); //removes routes-> resources
+                board.tearDown(); //removes routes-> resources!
             }
         });
 
-
-        //Battery level Listener: (Akkuanzeige)
-        findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_magnet).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                new BatteryListener(act).execute(board);
-                //Integer.toHexString(new BatteryListener().getBatteryLife());
-                Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
+            public void onClick(View v) {
+                Intent intent1 = new Intent(act,com.example.maurer.sensorstream.Magnetometer_stream.class);
+                startActivity(intent1);
             }
         });
     }
@@ -201,6 +193,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Log.wtf("sensorstream","Service Connected");
 
         retrieveBoard(address); //Board mit MAC-Adresse ansprechen
+
+        //batteryListener:
+        //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
     }
 
     @Override
@@ -220,6 +215,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void retrieveBoard(final String macAddr) {
         final BluetoothManager btManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+        if  (btManager==null){
+            retrieveBoard(macAddr);
+        }
         final BluetoothDevice remoteDevice =
                 btManager.getAdapter().getRemoteDevice(macAddr);
 
@@ -237,24 +235,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });
-
-                // get Signal strength (RSSI): selbes Problem wie unten beschrieben
-                /**board.readRssiAsync().continueWith(new Continuation<Integer, Void>() {
-                    @Override
-                    public Void then(Task<Integer> task) throws Exception {
-                        Log.i("sensorstream", "RSSI: " + task.getResult());
-                        return null;
-                    }
-                });*/
-                //Device info: (funktioniert nicht)=> wird zu früh aufgerufen->bevor Board connected ist
-                /**board.readDeviceInformationAsync()
-                        .continueWith(new Continuation<DeviceInformation, Void>() {
-                            @Override
-                            public Void then(Task<DeviceInformation> task) throws Exception {
-                                Log.i("sensorstream", "Device Information: " + task.getResult());
-                                return null;
-                            }
-                        });*/
 
                 // Verbindungsabbruch:
                 board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
@@ -280,13 +260,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         playLed(Led.Color.GREEN); //Output for user
         TextView v = (TextView) findViewById(R.id.Con_status);
         v.setTextColor(getResources().getColor(R.color.accepted));
-        String display = "Connection succeded";
+        String display = "Connection succeed";
         v.setText(display);
     }
 
     //Aufruf, wenn Connection verloren geht; Anzeige durch TextView
     private void Lost() {
-        //Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
         TextView v = (TextView) findViewById(R.id.Con_status);
         v.setText("Connection failed\n  Check Bluetooth Connection");
@@ -305,26 +285,4 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             led.play();
         }
     }
-    /**private SensorEventListener mSensorEventListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            Sensor sensor = sensorEvent.sensor;
-            if (sensor.getType() == Sensor.TYPE_ACCELEROMETER){
-                accelerometer.configure()
-                        .odr(60f)   // Sampling frequency(50Hz)
-                        .commit();
-                Log.i("stream","accelerometer");
-            }
-            else if (sensor.getType() == Sensor.TYPE_GYROSCOPE){
-                gyro.configure()
-                .odr(GyroBmi160.OutputDataRate.ODR_25_HZ)
-                .range(GyroBmi160.Range.FSR_125)
-                .commit();
-                Log.i("stream","gyroscope");
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {}
-    };*/
 }

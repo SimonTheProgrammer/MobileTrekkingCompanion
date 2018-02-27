@@ -19,16 +19,27 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Temperature ("+
-        "Time TEXT"+
-        "value REAL"); //8byte float
+                "Time TEXT"+
+                "value REAL"); //8byte float
         db.execSQL("CREATE TABLE Battery"+
-        "Time TEXT"+
-        "value INT");
+                "Time TEXT"+
+                "value INT");
         db.execSQL("CREATE TABLE Accelerometer"+
                 "Time TEXT"+
                 "valueX REAL"+
                 "valueY REAL"+
                 "valueZ REAL");
+        db.execSQL("CREATE TABLE Gyroscope"+
+                "Time TEXT"+
+                "valueX REAL"+
+                "valueY REAL"+
+                "valueZ REAL");
+        db.execSQL("CREATE TABLE Baro_Hoehe"+
+                "Time TEXT"+
+                "value REAL");
+        db.execSQL("CREATE TABLE Baro_Druck"+
+                "Time TEXT"+
+                "value REAL");
         //db.execSQL("INSERT INTO Test VALUES (1,'hallo','Welt'");
     }
 

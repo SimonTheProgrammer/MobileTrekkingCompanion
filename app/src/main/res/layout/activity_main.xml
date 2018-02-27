@@ -36,7 +36,7 @@
         android:layout_alignParentEnd="true" />
 
     <TextView
-        android:text="Battery level: ?"
+        android:text="\n Battery Level: ?"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -60,5 +60,14 @@
         android:layout_marginTop="106dp"
         android:layout_below="@+id/stop"
         android:text="        " />
+
+    <Button
+        android:text="Kompass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_magnet"
+        android:layout_alignBaseline="@+id/tv_RSSi"
+        android:layout_alignBottom="@+id/tv_RSSi"
+        android:layout_toStartOf="@+id/battery" />
 
 </RelativeLayout>
