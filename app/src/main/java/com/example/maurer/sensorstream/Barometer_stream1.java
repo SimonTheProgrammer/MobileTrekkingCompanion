@@ -40,7 +40,7 @@ public class Barometer_stream1 extends Thread {
     public void run() {
         super.run();
         try{
-            while(Slow_down()) {
+            //while(Slow_down()) {
                 Thread.sleep(5000);
 
                 //Pressure Data:
@@ -53,8 +53,10 @@ public class Barometer_stream1 extends Thread {
                             public void apply(Data data, Object... env) {
                                 try {
                                     Log.i("Barometer_stream", "Pressure (Pa) = " + data.value(Float.class));
-                                    l_pa.add(data.value(Float.class));
-                                }catch (Exception nex){}
+                                    //l_pa.add(data.value(Float.class));
+                                }catch(Exception e){
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
@@ -73,15 +75,12 @@ public class Barometer_stream1 extends Thread {
                         source.stream(new Subscriber() {
                             @Override
                             public void apply(Data data, Object... env) {
-                                try {
                                     Log.i("MainActivity", "Altitude (m) = " + data.value(Float.class));
-                                    l_h.add(data.value(Float.class));
+                                    //l_h.add(data.value(Float.class));
 
-                                    if (l_h.size() > 100) {
+                                    /*if (l_h.size() > 100) {
                                         Fetch_Hoehe();
-                                    }
-                                }catch(NullPointerException nex){
-                                }
+                                    }*/
                             }
                         });
                     }
@@ -93,7 +92,7 @@ public class Barometer_stream1 extends Thread {
                         return null;
                     }
                 });
-            }
+            //}
         }catch (Exception e){
             e.printStackTrace();
         }

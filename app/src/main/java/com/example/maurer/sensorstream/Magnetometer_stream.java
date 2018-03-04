@@ -135,7 +135,7 @@ public class Magnetometer_stream extends AppCompatActivity implements SensorEven
 
         try {
             txt_azimuth = (TextView) findViewById(R.id.textView);
-            txt_azimuth.setText(0+"° N");
+            txt_azimuth.setText(0+"°");
 
         if (mAzimuth >= 350 || mAzimuth <= 10){
             txt_azimuth.setText(mAzimuth+"° N");
@@ -159,7 +159,7 @@ public class Magnetometer_stream extends AppCompatActivity implements SensorEven
             txt_azimuth.setText(mAzimuth+"° O");
         }
         if (mAzimuth <= 80 || mAzimuth > 10){
-            txt_azimuth.setText(mAzimuth+"° NO");
+            txt_azimuth.setText(mAzimuth+"° ");
         }
         }catch (NullPointerException ex){
             Toast.makeText(this,"Nullpointer: TextView",Toast.LENGTH_SHORT);

@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  *Gyrosensor
                  * Magnetometer*/
 
-                accelerometer = board.getModule(Accelerometer.class);
+                /*accelerometer = board.getModule(Accelerometer.class);
                 accelerometer.configure()
                         .odr(1f) //Sampling frequency
                         .range(4f) //Range: +/-4g
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
                 t1.start();//*/
 
-                t2 = new Temperature_stream(act);
+                /*t2 = new Temperature_stream(act);
                 final Temperature temperature = board.getModule(Temperature.class);
                 tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];
@@ -109,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 t2.execute(tempSensor);//*/
 
                 //Drucksensor
-                baro = board.getModule(BarometerBmp280.class);
+                /*baro = board.getModule(BarometerBmp280.class);
                 baro.configure()
                         .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
-                        .pressureOversampling(BarometerBosch.OversamplingMode.LOW_POWER)
+                        .pressureOversampling(BarometerBosch.OversamplingMode.ULTRA_LOW_POWER)
                         .standbyTime(4f)
                         .commit();
                 baro.start();
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 t5 = new Gyroscope_stream();
                 t5.execute(gyro);//*/
 
-                Accelerometer_stream1 acc = new Accelerometer_stream1(accelerometer, act);
+                /*Accelerometer_stream1 acc = new Accelerometer_stream1(accelerometer, act);
                 acc.start();//*/
             }
         });
@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 try {
                     Intent intent = new Intent(act, com.example.maurer.sensorstream.DB.DB_Anzeige.class);
                     startActivity(intent);
-
                 }catch (NullPointerException ex){
                     Toast.makeText(act,"NullPointer Exception", Toast.LENGTH_SHORT).show();
                 }
@@ -164,8 +163,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BatteryListener1 buttz = new BatteryListener1(act,board);
-                buttz.start();
+                Timed_BatteryListener timer = new Timed_BatteryListener();
+                timer.startListener(act, board);
                 Log.i("Main","ClickListener");
                 //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
             }
@@ -193,9 +192,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Log.wtf("sensorstream","Service Connected");
 
         retrieveBoard(address); //Board mit MAC-Adresse ansprechen
-
-        //batteryListener:
-        //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
     }
 
     @Override
@@ -231,6 +227,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     Lost();
                 } else {
                     Succeed(macAddr);
+                    Timed_BatteryListener timer = new Timed_BatteryListener();
+                    timer.startListener(act, board);
                 }
                 return null;
             }
