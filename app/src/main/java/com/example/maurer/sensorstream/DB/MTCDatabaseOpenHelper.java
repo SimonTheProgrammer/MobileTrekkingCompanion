@@ -40,6 +40,12 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE Baro_Druck"+
                 "Time TEXT,"+
                 "value REAL");
+        db.execSQL("CREATE TABLE Kontaktdaten"+
+                "Vorname TEXT,"+
+                "Nachname TEXT,"+
+                "TelefonNr TEXT,"+
+                "EMail TEXT,"+
+                "Senden_als INTEGER,");
         //db.execSQL("INSERT INTO Test VALUES (1,'hallo','Welt'");
     }
 

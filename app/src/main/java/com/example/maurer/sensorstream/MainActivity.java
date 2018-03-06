@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
-import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,28 +13,13 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mbientlab.metawear.AsyncDataProducer;
-import com.mbientlab.metawear.Data;
-import com.mbientlab.metawear.DeviceInformation;
 import com.mbientlab.metawear.MetaWearBoard;
-import com.mbientlab.metawear.Route;
-import com.mbientlab.metawear.Subscriber;
 import com.mbientlab.metawear.android.BtleService;
-import com.mbientlab.metawear.builder.RouteBuilder;
-import com.mbientlab.metawear.builder.RouteComponent;
-import com.mbientlab.metawear.data.MagneticField;
 import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.BarometerBmp280;
-import com.mbientlab.metawear.module.BarometerBosch;
 import com.mbientlab.metawear.module.GyroBmi160;
-import com.mbientlab.metawear.module.GyroBmi160.Range;
-import com.mbientlab.metawear.module.GyroBmi160.OutputDataRate;
 import com.mbientlab.metawear.module.Led;
-import com.mbientlab.metawear.module.MagnetometerBmm150;
-import com.mbientlab.metawear.module.SensorFusionBosch;
 import com.mbientlab.metawear.module.Temperature;
-
-import java.io.IOException;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -44,15 +28,14 @@ import bolts.Task;
 public class MainActivity extends AppCompatActivity implements ServiceConnection{
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
-    private Accelerometer accelerometer;
     private Temperature.Sensor tempSensor;
     private Falling_stream1 t1;
     private Temperature_stream t2;
     private Gyroscope_stream t5;
     private GyroBmi160 gyro; //TESTEN
-    private BarometerBmp280 baro;
     Activity act = this;
     String address;
+    ThreadPool pool = null;
 
     /**
         @author: Simon Maurer
@@ -92,13 +75,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  *Gyrosensor
                  * Magnetometer*/
 
-                /*accelerometer = board.getModule(Accelerometer.class);
-                accelerometer.configure()
-                        .odr(1f) //Sampling frequency
-                        .range(4f) //Range: +/-4g
-                        .commit();
-                accelerometer.start();
-                t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
+                pool = new ThreadPool();
+                pool.initialize_Sensors(board);
+                pool.start_Threads(act);
+                /*t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
                 t1.start();//*/
 
                 /*t2 = new Temperature_stream(act);
@@ -108,17 +88,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 Log.i("MainActivity","start Temp");
                 t2.execute(tempSensor);//*/
 
-                //Drucksensor
-                /*baro = board.getModule(BarometerBmp280.class);
-                baro.configure()
-                        .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
-                        .pressureOversampling(BarometerBosch.OversamplingMode.ULTRA_LOW_POWER)
-                        .standbyTime(4f)
-                        .commit();
-                baro.start();
-                Log.i("MainActivity","start Baro");
-                Barometer_stream1 bar = new Barometer_stream1(act,baro);
-                bar.start();
+
 
                 /*gyro = board.getModule(GyroBmi160.class);
                 gyro.configure()
@@ -139,19 +109,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View view) {
                 Log.i("sensorstream","stop");
                 try {
-                    accelerometer.stop(); //t
-                    baro.stop();
-                    t2.cancel(true);
-                    t5.cancel(true);
+                    pool.stop_Threads();
                 }catch(Exception e){
                     Toast.makeText(act,"(1-7) Thread(s) konnte(n) nicht beendet werden!", Toast.LENGTH_LONG).show();
                 }
-                try {
+                /*try {
                     Intent intent = new Intent(act, com.example.maurer.sensorstream.DB.DB_Anzeige.class);
                     startActivity(intent);
                 }catch (NullPointerException ex){
                     Toast.makeText(act,"NullPointer Exception", Toast.LENGTH_SHORT).show();
-                }
+                }//*/
 
                 //DB anzeigen lassen
                 /**
@@ -185,7 +152,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });
     }
-
+    private boolean Slow_down() {
+        try {
+            Thread.sleep(1500);
+            return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         serviceBinder = (BtleService.LocalBinder) iBinder;
@@ -227,8 +202,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     Lost();
                 } else {
                     Succeed(macAddr);
-                    Timed_BatteryListener timer = new Timed_BatteryListener();
-                    timer.startListener(act, board);
                 }
                 return null;
             }
@@ -257,22 +230,20 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
         playLed(Led.Color.GREEN); //Output for user
         TextView v = (TextView) findViewById(R.id.Con_status);
+        v.setText("Connection succeeded");
         v.setTextColor(getResources().getColor(R.color.accepted));
-        String display = "Connection succeed";
-        v.setText(display);
     }
 
-    //Aufruf, wenn Connection verloren geht; Anzeige durch TextView
+    //Aufruf, wenn keine Verbindung möglich; Anzeige durch TextView
     private void Lost() {
-        Toast.makeText(MainActivity.this, "Failed to connect (CHECK BLUETOOTH CONNECTION)", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
         TextView v = (TextView) findViewById(R.id.Con_status);
         v.setText("Connection failed\n  Check Bluetooth Connection");
         v.setTextColor(getResources().getColor(R.color.error));
-
     }
 
-    //spielt LED am Board mit bestimmter Farbe
+    //plays LED in given color(3):
     private void playLed(Led.Color colour) {
         //LED
         Led led;

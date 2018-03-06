@@ -40,9 +40,6 @@ public class Barometer_stream1 extends Thread {
     public void run() {
         super.run();
         try{
-            //while(Slow_down()) {
-                Thread.sleep(5000);
-
                 //Pressure Data:
                 barometer.start();
                 barometer.pressure().addRouteAsync(new RouteBuilder() {
@@ -60,12 +57,6 @@ public class Barometer_stream1 extends Thread {
                             }
                         });
                     }
-                }).continueWith(new Continuation<Route, Void>() {
-                    @Override
-                    public Void then(Task<Route> task) {
-                        barometer.start();
-                        return null;
-                    }
                 });
 
                 //Höhenmeter:
@@ -77,36 +68,16 @@ public class Barometer_stream1 extends Thread {
                             public void apply(Data data, Object... env) {
                                     Log.i("MainActivity", "Altitude (m) = " + data.value(Float.class));
                                     //l_h.add(data.value(Float.class));
-
                                     /*if (l_h.size() > 100) {
                                         Fetch_Hoehe();
                                     }*/
                             }
                         });
                     }
-                }).continueWith(new Continuation<Route, Void>() {
-                    @Override
-                    public Void then(Task<Route> task) {
-                        barometer.altitude().start();
-                        barometer.start();
-                        return null;
-                    }
                 });
-            //}
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    private boolean Slow_down() {
-        try {
-            Thread.sleep(500);
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            barometer.stop();
-        }
-        return true;
     }
 
     private void Fetch_Hoehe() {
