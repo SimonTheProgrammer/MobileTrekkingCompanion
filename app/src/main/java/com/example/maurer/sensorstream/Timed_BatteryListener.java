@@ -23,10 +23,11 @@ import bolts.Task;
  */
 
 public class Timed_BatteryListener {
+    Timer t;
 
     public LinkedList list = new LinkedList();
     public void startListener(final Activity act, final MetaWearBoard board){
-        Timer t = new Timer();
+        t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -70,5 +71,9 @@ public class Timed_BatteryListener {
             Log.i("Liste", list.get(i) +"");
             list.remove(i);
         }
+    }
+
+    public  void stop(){
+        t.cancel();
     }
 }

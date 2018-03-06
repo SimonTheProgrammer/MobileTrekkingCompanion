@@ -20,15 +20,18 @@ public class ThreadPool {
     private Accelerometer accelerometer;
     Barometer_stream barometer_stream;
     Barometer_stream1 barometer_stream1;
+    Timed_BatteryListener timer;
+    MetaWearBoard board;
 
-    public void initialize_Sensors(MetaWearBoard board){
-        baro = board.getModule(BarometerBmp280.class);
+    public void initialize_Sensors(MetaWearBoard meta){
+        this.board = meta;
+        baro = meta.getModule(BarometerBmp280.class);
         baro.configure()
                 .filterCoeff(BarometerBosch.FilterCoeff.AVG_16)
                 .pressureOversampling(BarometerBosch.OversamplingMode.ULTRA_LOW_POWER)
                 .standbyTime(4f)
                 .commit();
-        accelerometer = board.getModule(Accelerometer.class);
+        accelerometer = meta.getModule(Accelerometer.class);
         accelerometer.configure()
                 .odr(1f) //Sampling frequency
                 .range(4f) //Range: +/-4g
@@ -37,6 +40,10 @@ public class ThreadPool {
     }
     public void start_Threads(final Activity act){
         Log.i("ThreadPool", "----------start Threads-------------");
+        timer = new Timed_BatteryListener();
+        timer.startListener(act, board);
+        Log.i("Main","ClickListener");
+
          barometer_stream = new Barometer_stream();
         barometer_stream.start(act, baro);
 
@@ -47,9 +54,9 @@ public class ThreadPool {
 
     public void stop_Threads(){
         //accelerometer.stop(); //t
-        baro.stop();
         barometer_stream.stop();
         barometer_stream1.stop();
+        timer.stop();
         //accelerometer.stop();
         //t2.cancel(true);
         //t5.cancel(true);

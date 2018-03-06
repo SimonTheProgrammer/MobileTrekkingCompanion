@@ -130,9 +130,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Timed_BatteryListener timer = new Timed_BatteryListener();
-                timer.startListener(act, board);
-                Log.i("Main","ClickListener");
+
                 //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
             }
         });
