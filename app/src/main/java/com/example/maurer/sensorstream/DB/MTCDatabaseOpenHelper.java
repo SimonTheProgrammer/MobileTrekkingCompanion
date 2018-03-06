@@ -20,10 +20,10 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE Temperature ("+
                 "Time TEXT,"+
-                "value REAL"); //8byte float
+                "VALUE REAL"); //8byte float
         db.execSQL("CREATE TABLE Battery"+
                 "Time TEXT,"+
-                "value INT");
+                "VALUE INT");
         db.execSQL("CREATE TABLE Accelerometer"+
                 "Time TEXT,"+
                 "valueX REAL,"+

@@ -14,6 +14,8 @@ import com.mbientlab.metawear.builder.RouteComponent;
 import com.mbientlab.metawear.module.BarometerBmp280;
 
 import java.util.LinkedList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -22,65 +24,61 @@ import bolts.Task;
  * Created by Maurer on 23.02.2018.
  */
 
-public class Barometer_stream1 extends Thread {
-/**
- * TODO: Zeitpunkt richtig timen (überschlägt sich selbst)
- */
-    Activity act;
-    LinkedList l_h;
-    LinkedList l_pa;
-    BarometerBmp280 barometer = null;
+public class Barometer_stream1{
 
-    public Barometer_stream1(Activity act, BarometerBmp280 barometer) {
-        this.act = act;
-        this.barometer = barometer;
+    Timer t = null;
+    LinkedList l_h = new LinkedList();
+
+    public void start(final Activity act, final BarometerBmp280 barometer) {
+        t = new Timer();
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try{
+                    Log.i("Barometer data",method(barometer)+" m");
+                    l_h.add(method(barometer));
+                }catch(Exception e){}
+                /*if (l_h.size() < 100)
+                    Fetch_Hoehe(act);*/
+            }
+        },0,5000);
     }
 
-    @Override
-    public void run() {
-        super.run();
+    float altitude;
+    private float method(final BarometerBmp280 barometer) {
         try{
-                //Pressure Data:
-                barometer.start();
-                barometer.pressure().addRouteAsync(new RouteBuilder() {
-                    @Override
-                    public void configure(RouteComponent source) {
-                        source.stream(new Subscriber() {
-                            @Override
-                            public void apply(Data data, Object... env) {
-                                try {
-                                    Log.i("Barometer_stream", "Pressure (Pa) = " + data.value(Float.class));
-                                    //l_pa.add(data.value(Float.class));
-                                }catch(Exception e){
-                                    e.printStackTrace();
-                                }
+            barometer.altitude().start();
+            barometer.start();
+            //Höhenmeter:
+            barometer.altitude().addRouteAsync(new RouteBuilder() {
+                @Override
+                public void configure(RouteComponent source) {
+                    source.stream(new Subscriber() {
+                        @Override
+                        public void apply(Data data, Object... env) {
+                            try {
+                                altitude = data.value(Float.class);
+                                //mehr Daten bei Ausgabe!!
+                            } catch (Exception e) {
+                                //e.printStackTrace();
+                                barometer.stop();
                             }
-                        });
-                    }
-                });
-
-                //Höhenmeter:
-                barometer.altitude().addRouteAsync(new RouteBuilder() {
-                    @Override
-                    public void configure(RouteComponent source) {
-                        source.stream(new Subscriber() {
-                            @Override
-                            public void apply(Data data, Object... env) {
-                                    Log.i("MainActivity", "Altitude (m) = " + data.value(Float.class));
-                                    //l_h.add(data.value(Float.class));
-                                    /*if (l_h.size() > 100) {
-                                        Fetch_Hoehe();
-                                    }*/
-                            }
-                        });
-                    }
-                });
+                        }
+                    });
+                }
+            }).continueWith(new Continuation<Route, Void>() {
+                @Override
+                public Void then(Task<Route> task) throws Exception {
+                    return null;
+                }
+            });
         }catch (Exception e){
             e.printStackTrace();
         }
+        return altitude;
     }
 
-    private void Fetch_Hoehe() {
+    private void Fetch_Hoehe(Activity act) {
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
         for (int i=0;i<l_h.size();i++) {
             ContentValues cv = new ContentValues();
@@ -99,22 +97,7 @@ public class Barometer_stream1 extends Thread {
         }
     }
 
-    private void Fetch_Pressure() {
-        MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
-        for (int i=0;i<l_pa.size();i++) {
-            ContentValues cv = new ContentValues();
-            if (i%2==0) //gerade
-                cv.put("Time", String.valueOf(l_pa.get(i)));
-            else //ungerade
-                cv.put("value", (float)l_pa.get(i));
-            SQLiteDatabase write = db.getWritableDatabase();
-            write.insertWithOnConflict("Barometer_Druck", null, cv, SQLiteDatabase.CONFLICT_FAIL);
-        }
-
-        //Liste leeren:
-        for (int i=0; i<l_pa.size();i++){
-            Log.i("Liste", l_pa.get(i) +"");
-            l_pa.remove(i);
-        }
+    public void stop(){
+        t.cancel();
     }
 }
