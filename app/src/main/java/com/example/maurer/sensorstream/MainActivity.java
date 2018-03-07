@@ -21,6 +21,9 @@ import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.Led;
 import com.mbientlab.metawear.module.Temperature;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import bolts.Continuation;
 import bolts.Task;
 
@@ -28,10 +31,7 @@ import bolts.Task;
 public class MainActivity extends AppCompatActivity implements ServiceConnection{
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
-    private Temperature.Sensor tempSensor;
     private Falling_stream1 t1;
-    private Temperature_stream t2;
-    private Gyroscope_stream t5;
     private GyroBmi160 gyro; //TESTEN
     Activity act = this;
     String address;
@@ -76,17 +76,18 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Magnetometer*/
 
                 pool = new ThreadPool();
-                pool.initialize_Sensors(board);
+                try {
+                    pool.initialize_Sensors(board);
+                }catch(Exception e){
+                    Log.i("ERROR","No connected Board");
+                }
                 pool.start_Threads(act);
                 /*t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
                 t1.start();//*/
 
-                /*t2 = new Temperature_stream(act);
-                final Temperature temperature = board.getModule(Temperature.class);
+                /*final Temperature temperature = board.getModule(Temperature.class);
                 tempSensor = temperature.findSensors
-                        (Temperature.SensorType.PRESET_THERMISTOR)[0];
-                Log.i("MainActivity","start Temp");
-                t2.execute(tempSensor);//*/
+                        (Temperature.SensorType.PRESET_THERMISTOR)[0];//*/
 
 
 
@@ -94,12 +95,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 gyro.configure()
                         .odr(OutputDataRate.ODR_25_HZ)
                         .range(Range.FSR_500)
-                        .commit();
-                t5 = new Gyroscope_stream();
-                t5.execute(gyro);//*/
-
-                /*Accelerometer_stream1 acc = new Accelerometer_stream1(accelerometer, act);
-                acc.start();//*/
+                        .commit();//*/
             }
         });
 
@@ -150,15 +146,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });
     }
-    private boolean Slow_down() {
-        try {
-            Thread.sleep(1500);
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
+
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         serviceBinder = (BtleService.LocalBinder) iBinder;
@@ -180,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         getApplicationContext().unbindService(this);
     }
 
+    int counter = 0;
     //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
         final BluetoothManager btManager =
@@ -204,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });
-
                 // Verbindungsabbruch:
                 board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
                     @Override
@@ -221,24 +209,60 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 return null;
             }
         });*/
+        final Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+
+                if (board.isConnected()) {
+                    timer.cancel();
+                    Log.i("Board", "Connection successful");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Status_board(1);
+                            cancel();
+                        }
+                    });
+
+                }counter++;
+                if (counter>2) {
+                    timer.cancel();
+                    Log.i("Board", "Connection failed");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Status_board(0);
+                            cancel();
+                        }
+                    });
+                }
+            }
+        },0,4000);
     }
 
+    public void Status_board(int i){
+        if (i == 0){
+            TextView v = (TextView) findViewById(R.id.Con_status);
+            v.setText("Connection failed");
+            v.setTextColor(getResources().getColor(R.color.error));
+        }else{
+            TextView v = (TextView) findViewById(R.id.Con_status);
+            v.setText("Connected");
+            v.setTextColor(getResources().getColor(R.color.accepted));
+        }
+    }
     private void Succeed(String macAddr) {
         Log.i("Board", "Connected to " + macAddr);
         Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
         playLed(Led.Color.GREEN); //Output for user
-        TextView v = (TextView) findViewById(R.id.Con_status);
-        v.setText("Connection succeeded");
-        v.setTextColor(getResources().getColor(R.color.accepted));
     }
 
     //Aufruf, wenn keine Verbindung möglich; Anzeige durch TextView
     private void Lost() {
         Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
-        TextView v = (TextView) findViewById(R.id.Con_status);
-        v.setText("Connection failed\n  Check Bluetooth Connection");
-        v.setTextColor(getResources().getColor(R.color.error));
+
     }
 
     //plays LED in given color(3):
