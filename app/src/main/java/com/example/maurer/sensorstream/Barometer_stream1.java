@@ -35,7 +35,7 @@ public class Barometer_stream1{
             @Override
             public void run() {
                 try{
-                    Log.i("Barometer data",method(barometer)+" m");
+                    Log.i("Altitude",method(barometer)+" m");
                     l_h.add(method(barometer));
                 }catch(Exception e){}
                 /*if (l_h.size() < 100)
@@ -58,6 +58,10 @@ public class Barometer_stream1{
                         public void apply(Data data, Object... env) {
                             try {
                                 altitude = data.value(Float.class);
+                                while (altitude == 0.0){
+                                    Log.i("Data","0.0");
+                                    altitude = data.value(Float.class);
+                                }
                                 //mehr Daten bei Ausgabe!!
                             } catch (Exception e) {
                                 //e.printStackTrace();

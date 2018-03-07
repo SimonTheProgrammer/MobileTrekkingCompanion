@@ -40,11 +40,12 @@ public class Accelerometer_stream1{
                 try{
                     Log.i(method(accelerometer)+"","");
                     list.add(method(accelerometer));
-                    Datenanzeige(method(accelerometer));
+                    if (list.size() < 5)
+                        Fetch(list, act);
                 }catch(Exception e){}
             }
         },0,5000);
-        if (list.size() < 100)
+        if (list.size() < 5)
             Fetch(list, act);
     }
 

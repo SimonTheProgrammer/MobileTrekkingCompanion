@@ -35,7 +35,7 @@ public class Barometer_stream {
                        @Override
                        public void run() {
                            try {
-                               Log.i("Barometer data", method(barometer) + " Pa");
+                               Log.i("Pressure", method(barometer) + " Pa");
                            }catch(Exception e){}
 
                            l_pa.add(method(barometer));
@@ -81,7 +81,6 @@ public class Barometer_stream {
     } catch (Exception ex) {
         ex.printStackTrace();
     }
-        Log.i("Barometer", "------------(5sek)-------------");
         return pressure;
     }
 
