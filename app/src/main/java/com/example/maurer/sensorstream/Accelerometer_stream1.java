@@ -38,7 +38,7 @@ public class Accelerometer_stream1{
             @Override
             public void run() {
                 try{
-                    Log.i(method(accelerometer)+"","gangarang");
+                    Log.i(method(accelerometer)+"","");
                     list.add(method(accelerometer));
                     Datenanzeige(method(accelerometer));
                 }catch(Exception e){}
@@ -78,44 +78,43 @@ public class Accelerometer_stream1{
     }
 
     private void Datenanzeige(String last) {
-        float valX;
-        float valY;
-        float valZ;
-        Log.i("DATA",last.toString().replace('{','('));
+        String valX;
+        String valY;
+        String valZ;
+        Log.i("DATA",last.toString().trim());
         char[] c_arr = last.toCharArray();
 
-            if (c_arr[5] == '-') { //5
-                valX = c_arr[5] + c_arr[6] + c_arr[7] + c_arr[8] + c_arr[9] + c_arr[10]; //-valX
+            if (c_arr[4] == '-') { //5
+                valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
                 if (c_arr[16] == '-') {
-                    valY = c_arr[16] + c_arr[17] + c_arr[18] + c_arr[19] + c_arr[20] + c_arr[21]; //-valY
+                    valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
                     if (c_arr[28] == '-')
-                        valZ = c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31] + c_arr[32] + c_arr[33]; //-valZ
+                        valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
                     else
-                        valZ = c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31] + c_arr[32]; //valZ
+                        valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //valZ
                 } else {
-                    valY = c_arr[16] + c_arr[17] + c_arr[18] + c_arr[19] + c_arr[20]; //valY
+                    valY = c_arr[16]+"" + c_arr[17] +""+ c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //valY
                     if (c_arr[27] == '-')
-                        valZ = c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31] + c_arr[32]; //-valZ
+                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
                     else
-                        valZ = c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31]; //valZ
+                        valZ = c_arr[27] +""+ c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+""; //valZ
                 }
             }
 //                                             < ... >
             else {
-                valX = c_arr[5] + c_arr[6] + c_arr[7] + c_arr[8] + c_arr[9]; //valX
+                valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+""; //valX
                 if (c_arr[15] == '-') {
-                    valY = c_arr[15] + c_arr[16] + c_arr[17] + c_arr[18] + c_arr[19] + c_arr[20]; //-valY
+                    valY = c_arr[15] +""+ c_arr[16] +""+ c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //-valY
                     if (c_arr[27] == '-')
-                        valZ = c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31] + c_arr[32]; //-valZ
+                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
                     else
-                        valZ = c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31]; //valZ
+                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //valZ
                 } else {
-                    valY = c_arr[15] + c_arr[16] + c_arr[17] + c_arr[18] + c_arr[19]; //valY
+                    valY = c_arr[15]+"" + c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+""; //valY
                     if (c_arr[26] == '-')
-                        valZ = c_arr[26] + c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30] + c_arr[31]; //-valZ
-
+                        valZ = c_arr[26]+"" + c_arr[27] +""+ c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //-valZ
                     else
-                        valZ = c_arr[26] + c_arr[27] + c_arr[28] + c_arr[29] + c_arr[30]; //valZ
+                        valZ = c_arr[26]+"" + c_arr[27]+"" + c_arr[28] +""+ c_arr[29] +""+ c_arr[30]+""; //valZ
                 }
             }
 
@@ -126,9 +125,9 @@ public class Accelerometer_stream1{
 
     private void Fetch(LinkedList list, Activity activity) {
         //in DB einschreiben
-        Object valX = null;
-        Object valY = null;
-        Object valZ = null;
+        String valX;
+        String valY;
+        String valZ;
 
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(activity);
         for (int i=0;i<list.size();i++) {
@@ -139,49 +138,46 @@ public class Accelerometer_stream1{
                 String line = (String) list.get(i);
                 char[]c_arr = line.toCharArray();
 
-                if (c_arr[4]=='-'){
-                    valX = c_arr[4]+c_arr[5]+c_arr[6]+c_arr[7]+c_arr[8]+c_arr[9]; //-valX
-                    if (c_arr[16]=='-'){
-                        valY = c_arr[16]+c_arr[17]+c_arr[18]+c_arr[19]+c_arr[20]+c_arr[21]; //-valY
-                        if (c_arr[28]=='-')
-                            valZ = c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]+c_arr[32]+c_arr[33]; //-valZ
+                if (c_arr[4] == '-') { //5
+                    valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
+                    if (c_arr[16] == '-') {
+                        valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
+                        if (c_arr[28] == '-')
+                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
                         else
-                            valZ = c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]+c_arr[32]; //valZ
-                    }
-                    else{
-                        valY = c_arr[16]+c_arr[17]+c_arr[18]+c_arr[19]+c_arr[20]; //valY
-                        if (c_arr[27]=='-')
-                            valZ = c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]+c_arr[32]; //-valZ
+                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //valZ
+                    } else {
+                        valY = c_arr[16]+"" + c_arr[17] +""+ c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //valY
+                        if (c_arr[27] == '-')
+                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
                         else
-                            valZ = c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]; //valZ
+                            valZ = c_arr[27] +""+ c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+""; //valZ
                     }
                 }
 //                                             < ... >
-                else{
-                    valX = c_arr[4]+c_arr[5]+c_arr[6]+c_arr[7]+c_arr[8]; //valX
-                    if (c_arr[15]=='-'){
-                        valY = c_arr[15]+c_arr[16]+c_arr[17]+c_arr[18]+c_arr[19]+c_arr[20]; //-valY
-                        if (c_arr[27]=='-')
-                            valZ = c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]+c_arr[32]; //-valZ
+                else {
+                    valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+""; //valX
+                    if (c_arr[15] == '-') {
+                        valY = c_arr[15] +""+ c_arr[16] +""+ c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //-valY
+                        if (c_arr[27] == '-')
+                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
                         else
-                            valZ = c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]; //valZ
-                    }
-                    else{
-                        valY = c_arr[15]+c_arr[16]+c_arr[17]+c_arr[18]+c_arr[19]; //valY
-                        if (c_arr[26]=='-')
-                            valZ = c_arr[26]+c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]+c_arr[31]; //-valZ
-
+                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //valZ
+                    } else {
+                        valY = c_arr[15]+"" + c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+""; //valY
+                        if (c_arr[26] == '-')
+                            valZ = c_arr[26]+"" + c_arr[27] +""+ c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //-valZ
                         else
-                            valZ = c_arr[26]+c_arr[27]+c_arr[28]+c_arr[29]+c_arr[30]; //valZ
+                            valZ = c_arr[26]+"" + c_arr[27]+"" + c_arr[28] +""+ c_arr[29] +""+ c_arr[30]+""; //valZ
                     }
                 }
                 Log.i("X Wert: ",""+valX);
                 Log.i("Y Wert: ",""+valY);
                 Log.i("Z Wert: ",""+valZ);
 
-                cv.put("valueX", (float) valX);
-                cv.put("valueY", (float) valY);
-                cv.put("valueZ", (float) valZ);
+                cv.put("valueX", valX);
+                cv.put("valueY", valY);
+                cv.put("valueZ", valZ);
             }
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Accelerometer", "Parameter", cv, SQLiteDatabase.CONFLICT_FAIL);

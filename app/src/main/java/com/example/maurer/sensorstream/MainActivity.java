@@ -213,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-
                 if (board.isConnected()) {
                     timer.cancel();
                     Log.i("Board", "Connection successful");
@@ -238,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     });
                 }
             }
-        },0,4000);
+        },0,5000);
     }
 
     public void Status_board(int i){
