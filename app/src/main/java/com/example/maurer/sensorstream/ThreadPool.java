@@ -7,6 +7,7 @@ import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.module.Accelerometer;
 import com.mbientlab.metawear.module.BarometerBmp280;
 import com.mbientlab.metawear.module.BarometerBosch;
+import com.mbientlab.metawear.module.Temperature;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -18,6 +19,8 @@ import java.util.TimerTask;
 public class ThreadPool {
     private BarometerBmp280 baro;
     private Accelerometer accelerometer;
+    private Temperature.Sensor tempSensor;
+    Accelerometer_stream1 accelerometer_stream;
     Barometer_stream barometer_stream;
     Barometer_stream1 barometer_stream1;
     Timed_BatteryListener timer;
@@ -36,7 +39,7 @@ public class ThreadPool {
                 .odr(1f) //Sampling frequency
                 .range(4f) //Range: +/-4g
                 .commit();
-        //accelerometer.start();
+
     }
     public void start_Threads(final Activity act){
         Log.i("ThreadPool", "----------start Threads-------------");
@@ -46,10 +49,18 @@ public class ThreadPool {
 
          barometer_stream = new Barometer_stream();
         barometer_stream.start(act, baro);
-
-        barometer_stream1 = new Barometer_stream1();
+         barometer_stream1 = new Barometer_stream1();
         barometer_stream1.start(act, baro);
 
+        accelerometer.acceleration().start();
+        accelerometer.start();
+        accelerometer_stream = new Accelerometer_stream1();
+        accelerometer_stream.start(act, accelerometer);
+
+
+        //Gyroskop, Temperature umbauen
+
+        //Falling_stream extra
     }
 
     public void stop_Threads(){
@@ -57,8 +68,6 @@ public class ThreadPool {
         barometer_stream.stop();
         barometer_stream1.stop();
         timer.stop();
-        //accelerometer.stop();
-        //t2.cancel(true);
-        //t5.cancel(true);
+        accelerometer_stream.stop();
     }
 }
