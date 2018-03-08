@@ -49,20 +49,24 @@ public class Gyroscope_stream {
             public void run() {
                 String data = method(gyro);
                 try {
-                    //Log.i("Gyroscope ("+s+")", data + " g");
+                    //Liste füllen
                     if (!data.equals(0.0) && !data.equals(null)) {
                         list.add(s);
                         list.add(data);
-                        Log.i("Gyroscope", list.getLast() + "");
+                        Log.i("Gyroscope", list.getLast() +"  ("+list.size()+")");
                     }
+
+                    //in die DB speichern
+                    if (list.size() == 12)
+                        Fetch(act, list);
+
+                    //Liste leeren:
+                    if (list.size()>=12)
+                        list.clear();
                 }catch(Exception e){}
-                list.add(s);
 
             }
         },date,5000);
-
-        if (list.size() < 10){}
-            //Fetch(act);
     }
 
     private String method(final GyroBmi160 gyroBmi160) {
@@ -98,51 +102,51 @@ public class Gyroscope_stream {
         return dat;
     }
 
-    private LinkedList Fetch (Activity act) {
+    private void Fetch (Activity act, LinkedList l) {
         String valX;
         String valY;
         String valZ;
 
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
-        for (int i=0;i<list.size();i++) {
+        for (int i=0;i<l.size();i++) {
             ContentValues cv = new ContentValues();
             if (i%2==0) //gerade
-                cv.put("Time", String.valueOf(list.get(i)));
+                cv.put("Time", String.valueOf(l.get(i)));
             else { //ungerade
-                String line = (String) list.get(i);
+                String line = (String) l.get(i);
                 char[] c_arr = line.toCharArray();
 
                 if (c_arr[4] == '-') {
                     valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
-                    if (c_arr[16] == '-') {
-                        valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
-                        if (c_arr[28] == '-')
-                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
+                    if (c_arr[18] == '-') {
+                        valY = c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+"" + c_arr[22]+"" + c_arr[23]+""; //-valY
+                        if (c_arr[30] == '-')
+                            valZ = c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+""; //-valZ
                         else
-                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //valZ
+                            valZ = c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+""; //valZ
                     } else {
-                        valY = c_arr[16]+"" + c_arr[17] +""+ c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //valY
-                        if (c_arr[27] == '-')
-                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
+                        valY = c_arr[18]+"" + c_arr[19] +""+ c_arr[20]+"" + c_arr[21]+"" + c_arr[22]+""; //valY
+                        if (c_arr[29] == '-')
+                            valZ = c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+""; //-valZ
                         else
-                            valZ = c_arr[27] +""+ c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+""; //valZ
+                            valZ = c_arr[29] +""+ c_arr[30]+"" + c_arr[31] +""+ c_arr[32]+"" + c_arr[33]+""; //valZ
                     }
                 }
-//                                             < ... >
+//                                                       < ... >
                 else {
                     valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+""; //valX
-                    if (c_arr[15] == '-') {
-                        valY = c_arr[15] +""+ c_arr[16] +""+ c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //-valY
-                        if (c_arr[27] == '-')
-                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
+                    if (c_arr[17] == '-') {
+                        valY = c_arr[17] +""+ c_arr[18] +""+ c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+"" + c_arr[22]+""; //-valY
+                        if (c_arr[29] == '-')
+                            valZ = c_arr[29]+"" + c_arr[30]+"" + c_arr[31] +""+ c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+""; //-valZ
                         else
-                            valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //valZ
+                            valZ = c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //valZ
                     } else {
-                        valY = c_arr[15]+"" + c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+""; //valY
-                        if (c_arr[26] == '-')
-                            valZ = c_arr[26]+"" + c_arr[27] +""+ c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //-valZ
+                        valY = c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //valY
+                        if (c_arr[28] == '-')
+                            valZ = c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
                         else
-                            valZ = c_arr[26]+"" + c_arr[27]+"" + c_arr[28] +""+ c_arr[29] +""+ c_arr[30]+""; //valZ
+                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30] +""+ c_arr[31] +""+ c_arr[32]+""; //valZ
                     }
                 }
                 Log.i("X Wert: ",""+valX);
@@ -156,9 +160,6 @@ public class Gyroscope_stream {
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Gyroscope", null, cv, SQLiteDatabase.CONFLICT_FAIL);
         }
-
-        //Liste leeren:
-        return new LinkedList();
     }
 
     public void stop(){

@@ -52,7 +52,7 @@ public class Timed_BatteryListener {
                     }
                 });
             }
-        },0,10000);//ale 10 sek
+        },0,10000);//all 10 sec
     }
 
     private void Fetch(Activity activity) {
@@ -66,6 +66,7 @@ public class Timed_BatteryListener {
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Battery", null, cv, SQLiteDatabase.CONFLICT_IGNORE); //doesn´t write null in DB
         }
+        Log.i("Battery (List)",list.getLast()+"");
 
         //Liste leeren:
         for (int i=0; i<list.size();i++){

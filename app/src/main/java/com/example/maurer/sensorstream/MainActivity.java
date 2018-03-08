@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Accelerometer (+fallen)
                  * Druck (mit Höhenmeter)
                  * Temperatur
-                 *Gyrosensor
+                 * Gyrosensor
                  * Magnetometer*/
 
                 pool = new ThreadPool();
@@ -107,21 +107,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 }catch (NullPointerException ex){
                     Toast.makeText(act,"NullPointer Exception", Toast.LENGTH_SHORT).show();
                 }//*/
-
-                //DB anzeigen lassen
-                /**
-                 * neues Intent designen, welches die DB-Einträge anzeigt
-                    */
             }
         });
 
-        findViewById(R.id.battery).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //Log.i("Battery",Integer.toHexString(new BatteryListener(act).getBatteryLife()));
-            }
-        });
         //configure reset button:
         findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         serviceBinder = (BtleService.LocalBinder) iBinder;
         Log.wtf("sensorstream","Service Connected");
-
         retrieveBoard(address); //Board mit MAC-Adresse ansprechen
     }
 
@@ -270,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             @Override
             public void run() {
                 final AlertDialog.Builder alert = new AlertDialog.Builder(act);
-                alert.setMessage("Keine Verbindung zum Board! (ERROR 404)")
+                alert.setMessage("Keine Verbindung zum Board! (ERROR)")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

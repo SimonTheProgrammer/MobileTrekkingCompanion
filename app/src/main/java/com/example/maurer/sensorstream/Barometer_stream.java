@@ -42,18 +42,23 @@ public class Barometer_stream {
             public void run() {
                 float data = method(barometer);
                 try {
-                    //Log.i("Pressure ("+s+")", data + " Pa");
+                    //Liste füllen
                     if (data != 0.0){
                         l_pa.add(s);
                         l_pa.add(data);
-                        Log.i("Pressure",l_pa.getLast()+"");
+                        Log.i("Pressure",l_pa.getLast()+"  ("+l_pa.size()+")");
                     }
+
+                    //in die DB speichern
+                    if (l_pa.size() == 12)
+                        Fetch_Pressure(act, l_pa);
+
+                    //Liste leeren:
+                    if (l_pa.size()>=12)
+                        l_pa.clear();
                 }catch(Exception e){}
             }
         },date,5000);
-
-        if (l_pa.size() < 10)
-            Fetch_Pressure(act);
     }
 
     float pressure;
@@ -73,10 +78,6 @@ public class Barometer_stream {
                             Calendar calendar = Calendar.getInstance();
                             s = format.format(calendar.getTime());
                             pressure = data.value(Float.class);
-                            l_pa.add(data.value(Float.class));
-                            while (pressure == 0.0){
-                                pressure = data.value(Float.class);
-                            }
 
                             //mehr Daten bei Ausgabe!!
                             /*Log.i("Daten",pressure");*/
@@ -100,22 +101,16 @@ public class Barometer_stream {
         return pressure;
     }
 
-    private void Fetch_Pressure(Activity act) {
+    private void Fetch_Pressure(Activity act, LinkedList l) {
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
-        for (int i=0;i<l_pa.size();i++) {
+        for (int i=0;i<l.size();i++) {
             ContentValues cv = new ContentValues();
             if (i%2==0) //gerade
-                cv.put("Time", String.valueOf(l_pa.get(i)));
+                cv.put("Time", String.valueOf(l.get(i)));
             else //ungerade
-                cv.put("value", (float)l_pa.get(i));
+                cv.put("value", (float)l.get(i));
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Barometer_Druck", null, cv, SQLiteDatabase.CONFLICT_FAIL);
-        }
-
-        //Liste leeren:
-        for (int i=0; i<l_pa.size();i++){
-            Log.i("Liste", l_pa.get(i) +"");
-            l_pa.remove(i);
         }
     }
 

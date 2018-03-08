@@ -42,18 +42,23 @@ public class Barometer_stream1{
             public void run() {
                 float data = method(barometer);
                 try{
-                    //Log.i("Altitude ("+s+")",data+" m");
+                    //Liste füllen
                     if (data != 0.0) {
                         l_h.add(s);
                         l_h.add(data);
-                        Log.i("Altitude", l_h.getLast() + "");
+                        Log.i("Altitude", l_h.getLast() + "  ("+l_h.size()+")");
                     }
+
+                    //in die DB speichern
+                    if (l_h.size() == 12)
+                        Fetch_Hoehe(act,l_h);
+
+                    //Liste leeren:
+                    if (l_h.size()>=12)
+                        l_h.clear();
                 }catch(Exception e){}
             }
         },date,5000);
-
-        if (l_h.size() < 10)
-            Fetch_Hoehe(act);
     }
 
     float altitude;
@@ -96,22 +101,16 @@ public class Barometer_stream1{
         return altitude;
     }
 
-    private void Fetch_Hoehe(Activity act) {
+    private void Fetch_Hoehe(Activity act, LinkedList l) {
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
-        for (int i=0;i<l_h.size();i++) {
+        for (int i=0;i<l.size();i++) {
             ContentValues cv = new ContentValues();
             if (i%2==0) //gerade
-                cv.put("Time", String.valueOf(l_h.get(i)));
+                cv.put("Time", String.valueOf(l.get(i)));
             else //ungerade
-                cv.put("value", (float)l_h.get(i));
+                cv.put("value", (float)l.get(i));
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Barometer_Hoehe", null, cv, SQLiteDatabase.CONFLICT_FAIL);
-        }
-
-        //Liste leeren:
-        for (int i=0; i<l_h.size();i++){
-            Log.i("Liste", l_h.get(i) +"");
-            l_h.remove(i);
         }
     }
 

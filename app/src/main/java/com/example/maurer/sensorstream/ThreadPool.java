@@ -70,7 +70,7 @@ public class ThreadPool {
 
         gyroscope_stream  = new Gyroscope_stream();
         gyroscope_stream.start(act,gyro);
-        //Gyroskop, Temperature umbauen
+        //Temperature umbauen
 
         //Falling_stream extra
     }

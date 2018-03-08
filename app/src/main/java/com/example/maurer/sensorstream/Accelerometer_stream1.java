@@ -43,17 +43,23 @@ public class Accelerometer_stream1{
             public void run() {
                 String data = method(accelerometer);
                 try{
-                    //Log.i("Accelerometer",data+"");
+                    //Liste füllen
                     if (!data.equals(0.0) && !data.equals(null)){
                         list.add(s);
                         list.add(data);
-                        Log.i("Accelerometer",list.getLast()+"");
+                        Log.i("Accelerometer",list.getLast()+"  ("+list.size()+")");
                     }
+
+                    //in die DB speichern
+                    if (list.size() == 12)
+                        Fetch(list, act);
+
+                    //Liste leeren:
+                    if (list.size()>=12)
+                        list.clear();
                 }catch(Exception e){}
             }
         },date,5000);
-        if (list.size() < 5)
-            list = Fetch(list, act);
     }
 
     String dat;
@@ -90,19 +96,19 @@ public class Accelerometer_stream1{
         return dat;
     }
 
-    private LinkedList Fetch(LinkedList list, Activity activity) {
+    private void Fetch(LinkedList l, Activity activity) {
         //in DB einschreiben
         String valX;
         String valY;
         String valZ;
 
         MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(activity);
-        for (int i=0;i<list.size();i++) {
+        for (int i=0;i<l.size();i++) {
             ContentValues cv = new ContentValues();
             if (i%2==0) //gerade
-                cv.put("Time", String.valueOf(list.get(i)));
+                cv.put("Time", String.valueOf(l.get(i)));
             else{ //ungerade
-                String line = (String) list.get(i);
+                String line = (String) l.get(i);
                 char[]c_arr = line.toCharArray();
 
                 if (c_arr[4] == '-') {
@@ -149,9 +155,6 @@ public class Accelerometer_stream1{
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Accelerometer", "Parameter", cv, SQLiteDatabase.CONFLICT_FAIL);
         }
-
-        //Liste leeren:
-        return new LinkedList();
     }
 
     public void stop(){
