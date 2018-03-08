@@ -16,6 +16,7 @@ import com.mbientlab.metawear.module.Accelerometer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,22 +35,31 @@ public class Accelerometer_stream1{
 
     public void start(final Activity act,final Accelerometer accelerometer){
         t = new Timer();
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.SECOND,5);
+        Date date = c.getTime();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
+                String data = method(accelerometer);
                 try{
-                    Log.i(method(accelerometer)+"","");
-                    list.add(method(accelerometer));
-                    if (list.size() < 5)
-                        Fetch(list, act);
+                    //Log.i("Accelerometer",data+"");
+                    if (!data.equals(0.0) && !data.equals(null)){
+                        list.add(s);
+                        list.add(data);
+                        Log.i("Accelerometer",list.getLast()+"");
+                    }
                 }catch(Exception e){}
             }
-        },0,5000);
+        },date,5000);
         if (list.size() < 5)
-            Fetch(list, act);
+            list = Fetch(list, act);
     }
 
     String dat;
+    String s;
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+
     private String method(final Accelerometer accelerometer) {
         try{
         accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
@@ -59,6 +69,8 @@ public class Accelerometer_stream1{
                     @Override
                     public void apply(Data data, Object... env) {
                         try {
+                            Calendar calendar = Calendar.getInstance();
+                            s = format.format(calendar.getTime());
                             dat = data.value(Acceleration.class)+"";
                         }catch(Exception e){
                             accelerometer.stop();
@@ -78,53 +90,7 @@ public class Accelerometer_stream1{
         return dat;
     }
 
-    private void Datenanzeige(String last) {
-        String valX;
-        String valY;
-        String valZ;
-        Log.i("DATA",last.toString().trim());
-        char[] c_arr = last.toCharArray();
-
-            if (c_arr[4] == '-') { //5
-                valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
-                if (c_arr[16] == '-') {
-                    valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
-                    if (c_arr[28] == '-')
-                        valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
-                    else
-                        valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //valZ
-                } else {
-                    valY = c_arr[16]+"" + c_arr[17] +""+ c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //valY
-                    if (c_arr[27] == '-')
-                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
-                    else
-                        valZ = c_arr[27] +""+ c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+""; //valZ
-                }
-            }
-//                                             < ... >
-            else {
-                valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+""; //valX
-                if (c_arr[15] == '-') {
-                    valY = c_arr[15] +""+ c_arr[16] +""+ c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //-valY
-                    if (c_arr[27] == '-')
-                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
-                    else
-                        valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //valZ
-                } else {
-                    valY = c_arr[15]+"" + c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+""; //valY
-                    if (c_arr[26] == '-')
-                        valZ = c_arr[26]+"" + c_arr[27] +""+ c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //-valZ
-                    else
-                        valZ = c_arr[26]+"" + c_arr[27]+"" + c_arr[28] +""+ c_arr[29] +""+ c_arr[30]+""; //valZ
-                }
-            }
-
-        Log.i("X-Wert",valX+"");
-        Log.i("Y-Wert",valY+"");
-        Log.i("Z-Wert",valZ+"");
-        }
-
-    private void Fetch(LinkedList list, Activity activity) {
+    private LinkedList Fetch(LinkedList list, Activity activity) {
         //in DB einschreiben
         String valX;
         String valY;
@@ -139,7 +105,7 @@ public class Accelerometer_stream1{
                 String line = (String) list.get(i);
                 char[]c_arr = line.toCharArray();
 
-                if (c_arr[4] == '-') { //5
+                if (c_arr[4] == '-') {
                     valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
                     if (c_arr[16] == '-') {
                         valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
@@ -185,7 +151,7 @@ public class Accelerometer_stream1{
         }
 
         //Liste leeren:
-        list.clear();
+        return new LinkedList();
     }
 
     public void stop(){

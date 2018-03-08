@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
     private Falling_stream1 t1;
-    private GyroBmi160 gyro; //TESTEN
     Activity act = this;
     String address;
     ThreadPool pool = null;
@@ -88,14 +88,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 /*final Temperature temperature = board.getModule(Temperature.class);
                 tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];//*/
-
-
-
-                /*gyro = board.getModule(GyroBmi160.class);
-                gyro.configure()
-                        .odr(OutputDataRate.ODR_25_HZ)
-                        .range(Range.FSR_500)
-                        .commit();//*/
             }
         });
 
@@ -169,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     }
 
     int counter = 0;
+
     //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
         final BluetoothManager btManager =
@@ -210,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });*/
         final Timer timer = new Timer();
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -220,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         @Override
                         public void run() {
                             Status_board(1);
+                            Toast.makeText(MainActivity.this, "Verbunden", Toast.LENGTH_LONG).show();
                             cancel();
                         }
                     });
@@ -232,6 +227,16 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         @Override
                         public void run() {
                             Status_board(0);
+                            final AlertDialog.Builder alert = new AlertDialog.Builder(act);
+                            alert.setMessage("Keine Verbindung zum Board!")
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                            alert.show();
+                            Toast.makeText(MainActivity.this, "Keine Verbindung zum Board!", Toast.LENGTH_LONG).show();
                             cancel();
                         }
                     });
@@ -257,11 +262,24 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         playLed(Led.Color.GREEN); //Output for user
     }
 
-    //Aufruf, wenn keine Verbindung möglich; Anzeige durch TextView
+    //Aufruf, wenn keine Verbindung möglich
     private void Lost() {
         Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
-
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                final AlertDialog.Builder alert = new AlertDialog.Builder(act);
+                alert.setMessage("Keine Verbindung zum Board! (ERROR 404)")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alert.show();
+            }
+        });
     }
 
     //plays LED in given color(3):

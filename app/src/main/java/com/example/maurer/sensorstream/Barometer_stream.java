@@ -13,6 +13,9 @@ import com.mbientlab.metawear.builder.RouteBuilder;
 import com.mbientlab.metawear.builder.RouteComponent;
 import com.mbientlab.metawear.module.BarometerBmp280;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,21 +34,31 @@ public class Barometer_stream {
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.SECOND,5);
+        Date date = c.getTime();
         t.schedule(new TimerTask() {
-                       @Override
-                       public void run() {
-                           try {
-                               Log.i("Pressure", method(barometer) + " Pa");
-                           }catch(Exception e){}
+            @Override
+            public void run() {
+                float data = method(barometer);
+                try {
+                    //Log.i("Pressure ("+s+")", data + " Pa");
+                    if (data != 0.0){
+                        l_pa.add(s);
+                        l_pa.add(data);
+                        Log.i("Pressure",l_pa.getLast()+"");
+                    }
+                }catch(Exception e){}
+            }
+        },date,5000);
 
-                           l_pa.add(method(barometer));
-                       }
-                   },0,5000);
-
-        if (l_pa.size() < 100)
+        if (l_pa.size() < 10)
             Fetch_Pressure(act);
     }
+
     float pressure;
+    String s;
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 
     private float method(final BarometerBmp280 barometer) {
         try{
@@ -57,13 +70,16 @@ public class Barometer_stream {
                     @Override
                     public void apply(Data data, Object... env) {
                         try {
+                            Calendar calendar = Calendar.getInstance();
+                            s = format.format(calendar.getTime());
                             pressure = data.value(Float.class);
-                            //mehr Daten bei Ausgabe!!
                             l_pa.add(data.value(Float.class));
                             while (pressure == 0.0){
-                                Log.i("Data","0.0");
                                 pressure = data.value(Float.class);
                             }
+
+                            //mehr Daten bei Ausgabe!!
+                            /*Log.i("Daten",pressure");*/
                         } catch (Exception e) {
                             //e.printStackTrace();
                             barometer.stop();

@@ -13,6 +13,9 @@ import com.mbientlab.metawear.builder.RouteBuilder;
 import com.mbientlab.metawear.builder.RouteComponent;
 import com.mbientlab.metawear.module.BarometerBmp280;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -31,20 +34,32 @@ public class Barometer_stream1{
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.SECOND,5);
+        Date date = c.getTime();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
+                float data = method(barometer);
                 try{
-                    Log.i("Altitude",method(barometer)+" m");
-                    l_h.add(method(barometer));
+                    //Log.i("Altitude ("+s+")",data+" m");
+                    if (data != 0.0) {
+                        l_h.add(s);
+                        l_h.add(data);
+                        Log.i("Altitude", l_h.getLast() + "");
+                    }
                 }catch(Exception e){}
-                /*if (l_h.size() < 100)
-                    Fetch_Hoehe(act);*/
             }
-        },0,5000);
+        },date,5000);
+
+        if (l_h.size() < 10)
+            Fetch_Hoehe(act);
     }
 
     float altitude;
+    SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+    String s;
+
     private float method(final BarometerBmp280 barometer) {
         try{
             barometer.altitude().start();
@@ -57,12 +72,11 @@ public class Barometer_stream1{
                         @Override
                         public void apply(Data data, Object... env) {
                             try {
+                                Calendar calendar = Calendar.getInstance();
+                                s = format.format(calendar.getTime());
                                 altitude = data.value(Float.class);
-                                while (altitude == 0.0){
-                                    Log.i("Data","0.0");
-                                    altitude = data.value(Float.class);
-                                }
                                 //mehr Daten bei Ausgabe!!
+                                /*Log.i("Daten",altitude");*/
                             } catch (Exception e) {
                                 //e.printStackTrace();
                                 barometer.stop();

@@ -42,6 +42,7 @@ public class Timed_BatteryListener {
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
                         Log.i("Battery (" + format.format(calendar.getTime())+")", task.getResult().toString() + "%");
+
                         TextView v = (TextView) act.findViewById(R.id.battery);
                         v.setText(task.getResult().toString() + "%");
                         list.add(task.getResult().toString());
