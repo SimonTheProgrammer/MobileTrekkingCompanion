@@ -82,12 +82,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     Log.i("ERROR","No connected Board");
                 }
                 pool.start_Threads(act);
+
                 /*t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
                 t1.start();//*/
 
-                /*final Temperature temperature = board.getModule(Temperature.class);
-                tempSensor = temperature.findSensors
-                        (Temperature.SensorType.PRESET_THERMISTOR)[0];//*/
             }
         });
 

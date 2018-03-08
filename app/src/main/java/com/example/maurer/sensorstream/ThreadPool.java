@@ -50,7 +50,10 @@ public class ThreadPool {
                 gyro.configure()
                         .odr(GyroBmi160.OutputDataRate.ODR_25_HZ)
                         .range(GyroBmi160.Range.FSR_500)
-                        .commit();//*/
+                        .commit();
+        final Temperature temperature = board.getModule(Temperature.class);
+                tempSensor = temperature.findSensors
+                        (Temperature.SensorType.PRESET_THERMISTOR)[0];//*/
     }
     public void start_Threads(final Activity act){
         Log.i("ThreadPool", "----------start Threads-------------");
@@ -58,16 +61,20 @@ public class ThreadPool {
         battery.startListener(act, board);
         Log.i("Main","ClickListener");
 
+        //Barometer (Pressure)
          barometer_stream = new Barometer_stream();
         barometer_stream.start(act, baro);
+        //Barometer (Altitude)
          barometer_stream1 = new Barometer_stream1();
         barometer_stream1.start(act, baro);
 
+        //Accelerometer (?)
         accelerometer.acceleration().start();
         accelerometer.start();
         accelerometer_stream = new Accelerometer_stream1();
         accelerometer_stream.start(act, accelerometer);
 
+        //Gyroscope (°/s=> Room Location)
         gyroscope_stream  = new Gyroscope_stream();
         gyroscope_stream.start(act,gyro);
         //Temperature umbauen
