@@ -32,6 +32,31 @@
         <activity android:name=".DB.DB_Anzeige"
             android:screenOrientation="portrait">
         </activity>
+
+        <activity android:name=".Frontend.Datenanzeigen"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".Frontend.Datenanalyse"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".Frontend.Datenanzeigengeklickt"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".Frontend.Notfallkontakthinzufuegen"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".Frontend.Sturz"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".Frontend.ZulangePause"
+            android:screenOrientation="portrait">
+        </activity>
+
     </application>
 
 </manifest>

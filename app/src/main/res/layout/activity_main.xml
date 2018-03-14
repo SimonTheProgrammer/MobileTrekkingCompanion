@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -16,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/start" />
+        android:id="@+id/Wnd_start" />
 
     <Button
         android:text="Stop"
@@ -24,7 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="13dp"
         android:id="@+id/stop"
-        android:layout_below="@+id/start"
+        android:layout_below="@+id/Wnd_start"
         android:layout_alignParentStart="true" />
 
     <Button
@@ -36,30 +37,20 @@
         android:layout_alignParentEnd="true" />
 
     <TextView
-        android:text="\n Battery Level: ?"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/battery" />
-
-    <TextView
-        android:text="Connection Status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/Con_status"
-        android:textColor="@color/choco"
-        android:layout_marginEnd="29dp"
-        android:layout_alignTop="@+id/stop"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/tv_RSSi"
         android:layout_marginTop="106dp"
         android:layout_below="@+id/stop"
         android:text="        " />
+
+    <ImageView
+        android:layout_width="56dp"
+        android:layout_height="30dp"
+        app:srcCompat="@drawable/battery_50"
+        android:id="@+id/imageView"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/battery" />
 
     <Button
         android:text="Kompass"
@@ -69,5 +60,26 @@
         android:layout_alignBaseline="@+id/tv_RSSi"
         android:layout_alignBottom="@+id/tv_RSSi"
         android:layout_toStartOf="@+id/battery" />
+
+    <TextView
+        android:text="Connection Status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/Con_status"
+        android:textColor="@color/choco"
+        android:layout_marginBottom="44dp"
+        android:layout_above="@+id/reset"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Battery: ?"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/battery"
+        android:layout_marginLeft="40dp"
+        android:layout_marginEnd="12dp"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

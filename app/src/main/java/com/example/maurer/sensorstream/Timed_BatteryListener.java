@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Handler;
 
 import bolts.Continuation;
 import bolts.Task;
@@ -24,35 +26,34 @@ import bolts.Task;
 
 public class Timed_BatteryListener {
     Timer t;
-
     public LinkedList list = new LinkedList();
+    int lvl;
+
     public void startListener(final Activity act, final MetaWearBoard board){
         t = new Timer();
         t.schedule(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                board.readBatteryLevelAsync().continueWith(new Continuation<Byte, Object>() {
+                board.readBatteryLevelAsync().continueWith(new Continuation<Byte, Void>() {
                     @Override
-                    public Object then(Task<Byte> task) {
+                    public Void then(Task<Byte> task) {
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-                        Log.i("Battery (" + format.format(calendar.getTime())+")", task.getResult().toString() + "%");
+                        lvl = task.getResult().intValue();
 
-                        TextView v = (TextView) act.findViewById(R.id.battery);
+                        TextView v = (TextView) act.findViewById(R.id.batteryLevel);
                         v.setText(task.getResult().toString() + "%");
                         list.add(task.getResult().toString());
-                        if (list.size()>6)
+                        Log.i("Battery (" + format.format(calendar.getTime())+")", task.getResult().toString() + "%  "+"  ("+list.size()+")");
+                        if (list.size()>6) {
                             Fetch(act);
-                        return task.getResult();
+                            list.clear();
+                        }
+                        return null;
                     }
                 });
             }
-        },0,10000);//all 10 sec
+        },0,12000);//all 12 sec
     }
 
     private void Fetch(Activity activity) {
@@ -77,5 +78,9 @@ public class Timed_BatteryListener {
 
     public  void stop(){
         t.cancel();
+    }
+
+    public int getBatteryLevel() {
+        return lvl;
     }
 }

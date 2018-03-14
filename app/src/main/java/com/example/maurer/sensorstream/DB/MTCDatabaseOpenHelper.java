@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "MTC_DB";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public MTCDatabaseOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -18,12 +18,11 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Temperature ("+
+        db.execSQL("CREATE TABLE Test"+
+                "val TEXT");
+        db.execSQL("CREATE TABLE Temperature "+
                 "Time TEXT,"+
-                "VALUE REAL"); //8byte float
-        db.execSQL("CREATE TABLE Battery"+
-                "Time TEXT,"+
-                "VALUE INT");
+                "val INT");
         db.execSQL("CREATE TABLE Accelerometer"+
                 "Time TEXT,"+
                 "valueX REAL,"+

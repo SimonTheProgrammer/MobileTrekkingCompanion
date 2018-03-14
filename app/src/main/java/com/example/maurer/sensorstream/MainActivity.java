@@ -5,23 +5,37 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.*;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.maurer.sensorstream.Frontend.Datenanzeigen;
+import com.example.maurer.sensorstream.Frontend.Notfallkontakthinzufuegen;
+import com.example.maurer.sensorstream.Frontend.Sturz;
+import com.example.maurer.sensorstream.Frontend.ZulangePause;
+import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.MetaWearBoard;
+import com.mbientlab.metawear.Route;
+import com.mbientlab.metawear.Subscriber;
 import com.mbientlab.metawear.android.BtleService;
+import com.mbientlab.metawear.builder.RouteBuilder;
+import com.mbientlab.metawear.builder.RouteComponent;
+import com.mbientlab.metawear.builder.filter.Comparison;
+import com.mbientlab.metawear.builder.function.Function1;
 import com.mbientlab.metawear.module.Accelerometer;
-import com.mbientlab.metawear.module.BarometerBmp280;
-import com.mbientlab.metawear.module.GyroBmi160;
 import com.mbientlab.metawear.module.Led;
-import com.mbientlab.metawear.module.Temperature;
 
+import java.io.Serializable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,10 +46,14 @@ import bolts.Task;
 public class MainActivity extends AppCompatActivity implements ServiceConnection{
     private BtleService.LocalBinder serviceBinder;
     private MetaWearBoard board;
-    private Falling_stream1 t1;
     Activity act = this;
     String address;
     ThreadPool pool = null;
+    Accelerometer accelerometer;
+
+    public final String SmsSenden = "06509808173";
+    Boolean pressedOnce=false;
+    Boolean canClose= true;
 
     /**
         @author: Simon Maurer
@@ -53,7 +71,11 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.startseite);
+        Button start = (Button) findViewById(R.id.Wnd_start);
+        Button ende = (Button) findViewById(R.id.stop);
+        Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
 
         getApplicationContext().bindService(new Intent(this, BtleService.class),
                 this, Context.BIND_AUTO_CREATE);
@@ -63,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         this.setTitle("MobileTrekkingCompanion");
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
-        findViewById(R.id.start).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.Wnd_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.i("sensorstream","start");
@@ -74,49 +96,36 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                  * Temperatur
                  * Gyrosensor
                  * Magnetometer*/
+                accelerometer.acceleration().start();
+                accelerometer.start();
+
 
                 pool = new ThreadPool();
                 try {
                     pool.initialize_Sensors(board);
                 }catch(Exception e){
-                    Log.i("ERROR","No connected Board");
+                    Log.e("ERROR","No connected Board");
                 }
-                pool.start_Threads(act);
-
-                /*t1 = new Falling_stream1(accelerometer); //fallen -> ja oder nein (2s)
-                t1.start();//*/
-
-            }
-        });
-
-        // configure stop button:
-        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("sensorstream","stop");
-                try {
-                    pool.stop_Threads();
-                }catch(Exception e){
-                    Toast.makeText(act,"(1-7) Thread(s) konnte(n) nicht beendet werden!", Toast.LENGTH_LONG).show();
-                }
-                /*try {
-                    Intent intent = new Intent(act, com.example.maurer.sensorstream.DB.DB_Anzeige.class);
+                if (board!=null){
+                    Intent intent = new Intent(act, com.example.maurer.sensorstream.Frontend.Datenanzeigen.class);
+                    //intent.putExtra("board", (Parcelable) board);
+                    //Transport to Activity
+                    Datenanzeigen.b = board;
                     startActivity(intent);
-                }catch (NullPointerException ex){
-                    Toast.makeText(act,"NullPointer Exception", Toast.LENGTH_SHORT).show();
-                }//*/
+                }
+
             }
         });
 
         //configure reset button:
-        findViewById(R.id.reset).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.btn_reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 board.tearDown(); //removes routes-> resources!
             }
         });
 
-        findViewById(R.id.btn_magnet).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.magnet).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent1 = new Intent(act,com.example.maurer.sensorstream.Magnetometer_stream.class);
@@ -128,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
         serviceBinder = (BtleService.LocalBinder) iBinder;
-        Log.wtf("sensorstream","Service Connected");
+        Log.i("sensorstream","Service Connected");
         retrieveBoard(address); //Board mit MAC-Adresse ansprechen
     }
 
@@ -149,20 +158,23 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
+        Log.wtf("MAC",macAddr);
         final BluetoothManager btManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-        if  (btManager==null){
-            retrieveBoard(macAddr);
-        }
-        final BluetoothDevice remoteDevice =
-                btManager.getAdapter().getRemoteDevice(macAddr);
+        try {
+            if (btManager == null) {
+                if (macAddr != null && macAddr != "")
+                    retrieveBoard(macAddr);
+            }
+            final BluetoothDevice remoteDevice =
+                    btManager.getAdapter().getRemoteDevice(macAddr);
 
         // MetaWear board object for the Bluetooth Device
-        board = serviceBinder.getMetaWearBoard(remoteDevice);
+            board = serviceBinder.getMetaWearBoard(remoteDevice);
 
-        board.connectAsync().continueWith(new Continuation<Void, Void>() {
+        /*board.connectAsync().continueWith(new Continuation<Void, Task<Route>>() {
             @Override
-            public Void then(Task<Void> task) throws Exception {
+            public Task<Route> then(Task<Void> task) throws Exception {
                 if (task.isFaulted()) {
                     Lost();
                 } else {
@@ -170,7 +182,42 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 }
                 return null;
             }
-        });
+        });//*/
+
+            board.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
+                @Override
+                public Task<Route> then(Task<Void> task) throws Exception {
+                    accelerometer  = board.getModule(Accelerometer.class);
+                    accelerometer.configure()
+                            .odr(25f)
+                            .commit();
+
+                    return accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
+                        @Override
+                        public void configure(RouteComponent source) {
+                            //Codestuff
+                            Log.i("falling","configure");
+                            source.map(Function1.RSS).lowpass((byte) 5).filter(Comparison.EQ,-1).stream(new Subscriber() {
+                                @Override
+                                public void apply(Data data, Object... env) {
+                                    Log.i("falling","falling");
+                                }
+                            }).end();
+                        }
+                    });
+                }
+            }).continueWith(new Continuation<Route, Void>() {
+                @Override
+                public Void then(Task<Route> task) throws Exception {
+                    if (task.isFaulted()) {
+                        Lost();
+                    } else {
+                        Succeed(macAddr);
+                    }
+                    return null;
+                }
+            });
+
                 // Verbindungsabbruch:
                 board.onUnexpectedDisconnect(new MetaWearBoard.UnexpectedDisconnectHandler() {
                     @Override
@@ -178,7 +225,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         Log.i("MainActivity", "Unexpectedly lost connection: " + status);
                     }
                 });
-
+        }catch (Exception e){
+            Log.i("Board","null");
+        }
         //Manueller Verbindungsabbruch:
         /**board.disconnectAsync().continueWith(new Continuation<Void, Void>() {
             @Override
@@ -188,55 +237,59 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             }
         });*/
         final Timer timer = new Timer();
-
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (board.isConnected()) {
-                    timer.cancel();
-                    Log.i("Board", "Connection successful");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Status_board(1);
-                            Toast.makeText(MainActivity.this, "Verbunden", Toast.LENGTH_LONG).show();
-                            cancel();
-                        }
-                    });
-
-                }counter++;
-                if (counter>2) {
-                    timer.cancel();
-                    Log.i("Board", "Connection failed");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Status_board(0);
-                            final AlertDialog.Builder alert = new AlertDialog.Builder(act);
-                            alert.setMessage("Keine Verbindung zum Board!")
-                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            dialog.dismiss();
-                                        }
-                                    });
-                            alert.show();
-                            Toast.makeText(MainActivity.this, "Keine Verbindung zum Board!", Toast.LENGTH_LONG).show();
-                            cancel();
-                        }
-                    });
+                if (board != null) {
+                    if (board.isConnected()) {
+                        timer.cancel();
+                        Log.i("Board", "Connection successful");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Status_board(1);
+                                Toast.makeText(MainActivity.this, "Verbunden", Toast.LENGTH_LONG).show();
+                                cancel();
+                            }
+                        });
+                    }
+                    counter++;
+                    if (counter > 2) {
+                        timer.cancel();
+                        Log.i("Board", "Connection failed");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Status_board(0);
+                                final AlertDialog.Builder alert = new AlertDialog.Builder(act);
+                                alert.setMessage("Keine Verbindung zum Board!")
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                Intent intent = new Intent(act, com.example.maurer.sensorstream.MainActivity.class);
+                                                intent.putExtra("Address","");
+                                                startActivity(intent);
+                                            }
+                                        });
+                                alert.show();
+                                Toast.makeText(MainActivity.this, "Keine Verbindung zum Board!", Toast.LENGTH_LONG).show();
+                                cancel();
+                            }
+                        });
+                    }
                 }
             }
-        },0,5000);
+        },0,7000);
     }
 
     public void Status_board(int i){
         if (i == 0){
-            TextView v = (TextView) findViewById(R.id.Con_status);
+            TextView v = (TextView) findViewById(R.id.tvVerbingungYesNo);
             v.setText("Connection failed");
             v.setTextColor(getResources().getColor(R.color.error));
         }else{
-            TextView v = (TextView) findViewById(R.id.Con_status);
+            TextView v = (TextView) findViewById(R.id.tvVerbingungYesNo);
             v.setText("Connected");
             v.setTextColor(getResources().getColor(R.color.accepted));
         }
@@ -251,20 +304,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private void Lost() {
         Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                final AlertDialog.Builder alert = new AlertDialog.Builder(act);
-                alert.setMessage("Keine Verbindung zum Board! (ERROR)")
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                alert.show();
-            }
-        });
     }
 
     //plays LED in given color(3):
@@ -277,5 +316,138 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     .commit();
             led.play();
         }
+    }
+
+    //--------------------FRONTEND---------------------
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == event.KEYCODE_BACK) {
+            if (!pressedOnce) {
+                pressedOnce = true;
+                Toast.makeText(getApplicationContext(), "Zum beenden erneut drücken!!", Toast.LENGTH_SHORT).show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        pressedOnce = false;
+                    }
+                }, 4000);
+            } else if (pressedOnce) {
+                pressedOnce = false;
+                onBackPressed();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        //int i = getFragmentManager().getBackStackEntryCount();
+        //if (i > 0) {
+        //   getFragmentManager().popBackStack();
+        // if (i == 1) {
+        //  ImageView ivStart = (ImageView) findViewById(R.id.ivStart);
+        // ivStart.setColorFilter(Color.rgb(255, 255, 255), android.graphics.PorterDuff.Mode.MULTIPLY);
+        //   }
+        // } //else
+        //super.onBackPressed();
+
+    }
+
+    public void btnNotfallkontaktgedrueckt(final View sources) {
+
+        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, Notfallkontakthinzufuegen.class));
+
+    }
+
+    public void btnKontaktHinzufuegenGedrueckt(final View sources) {
+      /*  EditText vn = (EditText) findViewById(R.id.etVorname);
+        EditText nn = (EditText) findViewById(R.id.etNachname);
+        EditText telNr = (EditText) findViewById(R.id.etTelefonnummer);
+        String anruf = telNr.toString();
+        EditText email = (EditText) findViewById(R.id.etEmail);
+        CheckBox smsCheck = (CheckBox) findViewById(R.id.cbSMS);
+        CheckBox emailCheck = (CheckBox) findViewById(R.id.cbEmail);*/
+////        //NotfallKontaktDaten kontaktDaten= new NotfallKontaktDaten(
+//                //kontaktDaten.vorname=vn.toString(),
+//                //kontaktDaten.nachname=nn.toString(),
+//                //kontaktDaten.telefonnummer=anruf,
+//                //kontaktDaten.emailadresse=email.toString(),
+//               // kontaktDaten.smsTrue=smsCheck,
+//                //kontaktDaten.emailTrue=emailCheck;
+//
+//
+//
+//       // );
+//
+////        //Anruf
+////        Intent intent = new Intent();
+////        //intent.setAction(Intent.ACTION_CALL);
+////        //intent.setData(Uri.parse("tel:"+telNr.toString()));
+////        //startActivity(intent);
+////        if(smsCheck.isChecked())
+////        {
+////            //SMS senden
+////            SmsManager manager= SmsManager.getDefault();
+////            String smsText = "Test Trekking Companion";
+////            manager.sendTextMessage(SmsSenden, null, smsText, null, null);
+////        }
+////        if(emailCheck.isChecked())
+////        {
+////            //Email senden
+////            intent.setAction(Intent.ACTION_SEND);
+////            intent.setType("message/rfc822");
+////            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
+////            intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
+////            intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
+////
+////        }
+////        if(smsCheck.isChecked()&&emailCheck.isChecked())
+////        {
+////            //SMS senden
+////            SmsManager manager= SmsManager.getDefault();
+////            String smsText = "Test Trekking Companion";
+////            manager.sendTextMessage(SmsSenden, null, smsText, null, null);
+////
+////            //Email senden
+////            intent.setAction(Intent.ACTION_SEND);
+////            intent.setType("message/rfc822");
+////            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
+////            intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
+////            intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
+////        }
+
+        setContentView(R.layout.startseite);
+
+    }
+
+    public void zuLangePause(final View sources) {
+
+        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, ZulangePause.class));
+
+    }
+
+    public void sturzWahrgenommen(final View sources) {
+
+        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, Sturz.class));
+
+
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+
     }
 }

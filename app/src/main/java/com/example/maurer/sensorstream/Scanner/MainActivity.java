@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -23,6 +24,10 @@ import android.widget.ListView;
 import com.example.maurer.sensorstream.R;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by Maurer on 26.01.2018.
@@ -35,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<Device_Information> adapter;
     private ListView mListView;
     Activity a = this;
+    int counter=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,11 +52,7 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
             dlgAlert.setMessage("Gerät unterstützt kein Bluetooth!");
             dlgAlert.setTitle("Fehler");
-            dlgAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                }
-            });
+            dlgAlert.setPositiveButton("OK", null);
             dlgAlert.setCancelable(true);
             dlgAlert.create().show();
             Log.i("Bluetooth","not available");
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(final AdapterView<?> adapterView, View view, int i, long l) {
+                counter++;
                 final Device_Information selected = (Device_Information) adapterView.getItemAtPosition(i);
                 Log.i("Click",selected.toString());
                 //ContextCompat.getColor(context, R.color.right);
@@ -86,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
                 dlgAlert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Log.i("Device_selected","start coding here");
                         Intent intent = new Intent(a, com.example.maurer.sensorstream.MainActivity.class);
                         intent.putExtra("Address",selected.getAddress());
                         unregisterReceiver(mReceiver);
@@ -95,6 +97,28 @@ public class MainActivity extends AppCompatActivity {
                 });
                 dlgAlert.setCancelable(true);
                 dlgAlert.create().show();
+            }
+        });
+
+        Button b = (Button) findViewById(R.id.btn_offline);
+        b.setText("Abbrechen");
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(a);
+                    alert.setTitle("Keine Geräte gefunden!");
+                    alert.setMessage("Wollen sie ohne Gerätekopplung fortfahren?")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    Intent intent = new Intent(a, com.example.maurer.sensorstream.MainActivity.class);
+                                    intent.putExtra("Address","");
+                                    unregisterReceiver(mReceiver);
+                                    startActivity(intent);
+                                }
+                            });
+                    alert.show();
             }
         });
     }
@@ -115,15 +139,6 @@ public class MainActivity extends AppCompatActivity {
         getListView().setAdapter(adapter);
     }
 
-    protected ListAdapter getListAdapter() {
-        ListAdapter adapter = getListView().getAdapter();
-        if (adapter instanceof HeaderViewListAdapter) {
-            return ((HeaderViewListAdapter)adapter).getWrappedAdapter();
-        } else {
-            return adapter;
-        }
-    }
-
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -135,8 +150,9 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothClass bclass = device.getBluetoothClass();
 
                 Device_Information d = new Device_Information(deviceHardwareAddress,bclass,deviceName,type);
-                Log.i("New Device",deviceHardwareAddress + "; "+deviceName);
-                addItems(d);
+                Log.i("New Device",deviceHardwareAddress + ";"+deviceName);
+                if (deviceName.equals("MetaWear")) //nur MetaWear-Geräte anzeigen lassen
+                    addItems(d);
             }
         }
     };

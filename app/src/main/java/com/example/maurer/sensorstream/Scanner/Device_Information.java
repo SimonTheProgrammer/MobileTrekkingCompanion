@@ -23,16 +23,8 @@ public class Device_Information {
         return address;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public BluetoothClass getClas() {
         return clas;
-    }
-
-    public void setClas(BluetoothClass clas) {
-        this.clas = clas;
     }
 
     public String getName() {
@@ -50,10 +42,6 @@ public class Device_Information {
             return " 2\n Power: 2,5 mW (4dBm) \n Reichweite: 10 Meter";
         else
             return " 3\n Power: 1  (0dBm) \n Reichweite: 1 Meter";
-    }
-
-    public void setType(int type) {
-        this.type = type;
     }
 
     @Override
