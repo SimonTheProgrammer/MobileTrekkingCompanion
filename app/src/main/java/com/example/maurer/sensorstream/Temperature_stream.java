@@ -28,7 +28,7 @@ import bolts.Task;
  * Created by Maurer on 08.01.2018.
  */
 public class Temperature_stream {
-    LinkedList list = new LinkedList();
+    public LinkedList list = new LinkedList();
     Timer t = null;
     float data;
     //volatile boolean run = true;

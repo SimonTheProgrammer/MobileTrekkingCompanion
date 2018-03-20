@@ -22,9 +22,46 @@ public class ZulangePause extends AppCompatActivity {
             }
 
             public void onFinish() {
-                sekAnzahl.setText("");
+                /* MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
+                SQLiteDatabase read = db.getReadableDatabase();
+
+                // Anruf
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + telNr.toString()));
+                startActivity(intent);
+                if (smsCheck.isChecked()) {
+                    //SMS senden
+                    SmsManager manager = SmsManager.getDefault();
+                    String smsText = "Test Trekking Companion";
+                    manager.sendTextMessage(SmsSenden, null, smsText, null, null);
+                }
+                if (anrufCheck.isChecked()) {
+                    //Email senden
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("message/rfc822");
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
+
+                }
+                if (smsCheck.isChecked() && emailCheck.isChecked()) {
+                    //SMS senden
+                    SmsManager manager = SmsManager.getDefault();
+                    String smsText = "Test Trekking Companion";
+                    manager.sendTextMessage(SmsSenden, null, smsText, null, null);
+
+                    //Email senden
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("message/rfc822");
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
+                    intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
+                }*/
             }
         }.start();
+
+
 
     }
 }

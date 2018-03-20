@@ -23,12 +23,12 @@ public class ThreadPool {//implements Parcelable{
     private Accelerometer accelerometer;
     private GyroBmi160 gyro;
     private Temperature.Sensor tempSensor;
-    Accelerometer_stream1 accelerometer_stream;
-    Barometer_stream barometer_stream;
-    Barometer_stream1 barometer_stream1;
-    Gyroscope_stream gyroscope_stream;
-    Temperature_stream temperature_stream;
-    Timed_BatteryListener battery;
+    public Accelerometer_stream1 accelerometer_stream;
+    public Barometer_stream barometer_stream;
+    public Barometer_stream1 barometer_stream1;
+    public Gyroscope_stream gyroscope_stream;
+    public Temperature_stream temperature_stream;
+    public Timed_BatteryListener battery;
     MetaWearBoard board;
 
     public void initialize_Sensors(MetaWearBoard meta){

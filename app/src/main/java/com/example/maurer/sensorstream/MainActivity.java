@@ -121,7 +121,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.btn_reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                board.tearDown(); //removes routes-> resources!
+                //board.tearDown(); //removes routes-> resources!
+                Intent intent1 = new Intent(act,com.example.maurer.sensorstream.DB.DB_Anzeige.class);
+                startActivity(intent1);
             }
         });
 
@@ -130,6 +132,15 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
             public void onClick(View v) {
                 Intent intent1 = new Intent(act,com.example.maurer.sensorstream.Magnetometer_stream.class);
                 startActivity(intent1);
+            }
+        });
+
+        findViewById(R.id.btnNotfallkontakt).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(com.example.maurer.sensorstream.MainActivity.this, Notfallkontakthinzufuegen.class);
+                Notfallkontakthinzufuegen.act = act;
+                startActivity(intent);
             }
         });
     }
@@ -339,73 +350,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         //   }
         // } //else
         //super.onBackPressed();
-
-    }
-
-    public void btnNotfallkontaktgedrueckt(final View sources) {
-
-        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, Notfallkontakthinzufuegen.class));
-
-    }
-
-    public void btnKontaktHinzufuegenGedrueckt(final View sources) {
-      /*  EditText vn = (EditText) findViewById(R.id.etVorname);
-        EditText nn = (EditText) findViewById(R.id.etNachname);
-        EditText telNr = (EditText) findViewById(R.id.etTelefonnummer);
-        String anruf = telNr.toString();
-        EditText email = (EditText) findViewById(R.id.etEmail);
-        CheckBox smsCheck = (CheckBox) findViewById(R.id.cbSMS);
-        CheckBox emailCheck = (CheckBox) findViewById(R.id.cbEmail);*/
-////        //NotfallKontaktDaten kontaktDaten= new NotfallKontaktDaten(
-//                //kontaktDaten.vorname=vn.toString(),
-//                //kontaktDaten.nachname=nn.toString(),
-//                //kontaktDaten.telefonnummer=anruf,
-//                //kontaktDaten.emailadresse=email.toString(),
-//               // kontaktDaten.smsTrue=smsCheck,
-//                //kontaktDaten.emailTrue=emailCheck;
-//
-//
-//
-//       // );
-//
-////        //Anruf
-////        Intent intent = new Intent();
-////        //intent.setAction(Intent.ACTION_CALL);
-////        //intent.setData(Uri.parse("tel:"+telNr.toString()));
-////        //startActivity(intent);
-////        if(smsCheck.isChecked())
-////        {
-////            //SMS senden
-////            SmsManager manager= SmsManager.getDefault();
-////            String smsText = "Test Trekking Companion";
-////            manager.sendTextMessage(SmsSenden, null, smsText, null, null);
-////        }
-////        if(emailCheck.isChecked())
-////        {
-////            //Email senden
-////            intent.setAction(Intent.ACTION_SEND);
-////            intent.setType("message/rfc822");
-////            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
-////            intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
-////            intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
-////
-////        }
-////        if(smsCheck.isChecked()&&emailCheck.isChecked())
-////        {
-////            //SMS senden
-////            SmsManager manager= SmsManager.getDefault();
-////            String smsText = "Test Trekking Companion";
-////            manager.sendTextMessage(SmsSenden, null, smsText, null, null);
-////
-////            //Email senden
-////            intent.setAction(Intent.ACTION_SEND);
-////            intent.setType("message/rfc822");
-////            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{("helena.bayer98@gmail.com")});
-////            intent.putExtra(Intent.EXTRA_SUBJECT, "Warnung!!");
-////            intent.putExtra(Intent.EXTRA_TEXT, "Der Benutzer der Trekking Companion App ist gestürzt!!");
-////        }
-
-        setContentView(R.layout.startseite);
 
     }
 

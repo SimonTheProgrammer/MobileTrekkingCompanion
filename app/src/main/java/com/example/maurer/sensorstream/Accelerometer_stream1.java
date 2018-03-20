@@ -30,7 +30,7 @@ import bolts.Task;
 
 public class Accelerometer_stream1{
 
-    LinkedList list = new LinkedList();
+    public LinkedList list = new LinkedList();
     Timer t;
 
     public void start(final Activity act,final Accelerometer accelerometer){

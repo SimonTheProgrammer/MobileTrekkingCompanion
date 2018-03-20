@@ -30,7 +30,7 @@ import bolts.Task;
 public class Barometer_stream1{
 
     Timer t = null;
-    LinkedList l_h = new LinkedList();
+    public LinkedList l_h = new LinkedList();
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();

@@ -34,7 +34,7 @@ import bolts.Task;
 
 public class Gyroscope_stream {
     private String dat;
-    LinkedList list = new LinkedList();
+    public LinkedList list = new LinkedList();
     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
     String s;
     Timer t;

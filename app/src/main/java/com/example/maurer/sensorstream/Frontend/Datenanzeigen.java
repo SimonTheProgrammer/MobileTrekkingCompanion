@@ -63,13 +63,15 @@ public class Datenanzeigen extends AppCompatActivity {
 
 
     public void btnTemperaturGedrueckt(final View sources) {
-        startActivity(new Intent(Datenanzeigen.this, Temperatur.class));
-
+        Intent intent=new Intent(Datenanzeigen.this, Temperatur.class);
+        intent.putExtra("temp",pool.temperature_stream.list.toArray());
+        startActivity(intent);
     }
 
     public void btnGeschwindigkeitGedrueckt(final View sources) {
-        startActivity(new Intent(Datenanzeigen.this, Geschwindigkeit.class));
-
+        Intent intent = new Intent(Datenanzeigen.this, Geschwindigkeit.class);
+        intent.putExtra("accelero",pool.accelerometer_stream.list.toArray());
+        startActivity(intent);
     }
 
     public void btnHoehenmeterGedrueckt(final View sources) {
@@ -83,8 +85,11 @@ public class Datenanzeigen extends AppCompatActivity {
     }
 
     public void btnLuftdrukGedrueckt(final View sources) {
-        startActivity(new Intent(Datenanzeigen.this, Luftdruck.class));
+        Intent intent=new Intent(Datenanzeigen.this, Geschwindigkeit.class);
 
+        intent.putExtra("baro",pool.barometer_stream.l_pa.toArray()
+        );
+        startActivity(intent);
     }
 
     public void btnGoogleMapsGedrueckt(final View sources) {
