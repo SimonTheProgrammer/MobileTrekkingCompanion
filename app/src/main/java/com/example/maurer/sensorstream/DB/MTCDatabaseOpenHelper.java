@@ -44,7 +44,8 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
                 "Nachname TEXT,"+
                 "TelefonNr TEXT,"+
                 "EMail TEXT,"+
-                "Senden_als INTEGER,");
+                "Senden_Mail INT,"+
+                "Senden_Sms INT");
         //db.execSQL("INSERT INTO Test VALUES (1,'hallo','Welt'");
     }
 
