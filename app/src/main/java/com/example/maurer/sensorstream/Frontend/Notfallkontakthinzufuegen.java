@@ -2,6 +2,7 @@ package com.example.maurer.sensorstream.Frontend;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
+import com.example.maurer.sensorstream.MainActivity;
 import com.example.maurer.sensorstream.R;
 
 import java.util.regex.Matcher;
@@ -17,12 +19,10 @@ import java.util.regex.Pattern;
 
 public class Notfallkontakthinzufuegen extends AppCompatActivity {
 
-    Activity act;
+    public static Activity act;
     NotfallKontaktDaten kontaktDaten;
 
-    public Notfallkontakthinzufuegen(Activity activity) {
-        this.act = activity;
-    }
+    public Notfallkontakthinzufuegen() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,24 +99,25 @@ public class Notfallkontakthinzufuegen extends AppCompatActivity {
 
                     MTCDatabaseOpenHelper db = new MTCDatabaseOpenHelper(act);
                     ContentValues cv = new ContentValues();
-                    cv.put("Vorname", kontaktDaten.getVorname());
-                    cv.put("Nachname", kontaktDaten.getNachname());
-                    cv.put("TelefonNr", kontaktDaten.getTelefonnummer());
-                    cv.put("EMail", kontaktDaten.getEmailadresse());
-                    if (kontaktDaten.isEmailTrue())
+                    cv.put("Vorname", kontaktDaten.vorname);
+                    cv.put("Nachname", kontaktDaten.nachname);
+                    cv.put("TelefonNr", kontaktDaten.telefonnummer);
+                    cv.put("EMail", kontaktDaten.emailadresse);
+                    if (kontaktDaten.emailTrue)
                         cv.put("Senden_Mail", 1);
                     else
                         cv.put("Senden_Mail", 0);
 
-                    if (kontaktDaten.isSmsTrue())
+                    if (kontaktDaten.smsTrue)
                         cv.put("Senden_Sms", 1); //true
                     else
                         cv.put("Senden_Sms", 0); //false
                     SQLiteDatabase write = db.getWritableDatabase();
                     write.insertWithOnConflict("Kontaktdaten", null, cv, SQLiteDatabase.CONFLICT_FAIL);
+
+                    startActivity(new Intent(Notfallkontakthinzufuegen.this, MainActivity.class));
                 }
             }
-
         });
     }
 

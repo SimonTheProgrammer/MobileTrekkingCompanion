@@ -18,34 +18,34 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE Test"+
-                "val TEXT");
-        db.execSQL("CREATE TABLE Temperature "+
+        db.execSQL("CREATE TABLE Test("+
+                "val TEXT)");
+        db.execSQL("CREATE TABLE Temperature("+
                 "Time TEXT,"+
-                "val INT");
-        db.execSQL("CREATE TABLE Accelerometer"+
-                "Time TEXT,"+
-                "valueX REAL,"+
-                "valueY REAL,"+
-                "valueZ REAL");
-        db.execSQL("CREATE TABLE Gyroscope"+
+                "val INT)");
+        db.execSQL("CREATE TABLE Accelerometer("+
                 "Time TEXT,"+
                 "valueX REAL,"+
                 "valueY REAL,"+
-                "valueZ REAL");
-        db.execSQL("CREATE TABLE Baro_Hoehe"+
+                "valueZ REAL)");
+        db.execSQL("CREATE TABLE Gyroscope("+
                 "Time TEXT,"+
-                "value REAL");
-        db.execSQL("CREATE TABLE Baro_Druck"+
+                "valueX REAL,"+
+                "valueY REAL,"+
+                "valueZ REAL)");
+        db.execSQL("CREATE TABLE Baro_Hoehe("+
                 "Time TEXT,"+
-                "value REAL");
-        db.execSQL("CREATE TABLE Kontaktdaten"+
+                "value REAL)");
+        db.execSQL("CREATE TABLE Baro_Druck("+
+                "Time TEXT,"+
+                "value REAL)");
+        db.execSQL("CREATE TABLE Kontaktdaten("+
                 "Vorname TEXT,"+
                 "Nachname TEXT,"+
                 "TelefonNr TEXT,"+
                 "EMail TEXT,"+
                 "Senden_Mail INT,"+
-                "Senden_Sms INT");
+                "Senden_Sms INT)");
         //db.execSQL("INSERT INTO Test VALUES (1,'hallo','Welt'");
     }
 
