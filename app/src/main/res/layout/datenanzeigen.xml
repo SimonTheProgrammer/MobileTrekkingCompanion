@@ -34,7 +34,7 @@
         android:layout_gravity="center_horizontal"
         android:textSize="20dp" />
 
-    <TextView
+            <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="aktuelles Datum"
@@ -42,61 +42,65 @@
         android:id="@+id/tvDatum"
         android:layout_gravity="center_horizontal" />
 
-    <Chronometer
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/chronometer"
-        android:gravity="center" />
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="17dp"></LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Zeitaufzeichnung"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/tvZeitaufzeichnungSeitBeginn"
-        android:layout_gravity="center_horizontal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Zeitaufzeichnung"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/tvZeitaufzeichnungSeitBeginn"
+                android:layout_gravity="center_horizontal" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Temperatur"
         android:id="@+id/btnTemperatur"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnTemperaturGedrueckt"/>
+        android:onClick="btnTemperaturGedrueckt"
+                android:minHeight="45dip" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Geschwindigkeit"
         android:id="@+id/btnGeschwindigkeit"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnGeschwindigkeitGedrueckt"/>
+        android:onClick="btnGeschwindigkeitGedrueckt"
+                android:minHeight="45dip" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Höhenmeter"
         android:id="@+id/btnHoehenmeter"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnHoehenmeterGedrueckt"/>
+        android:onClick="btnHoehenmeterGedrueckt"
+                android:minHeight="45dip" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Pollenflugdaten"
         android:id="@+id/btnPollenflugdaten"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnPolltenflugdatenGedrueckt"/>
+        android:onClick="btnPolltenflugdatenGedrueckt"
+                android:minHeight="45dip" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Luftdruck"
         android:id="@+id/btnLuftdruck"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnLuftdrukGedrueckt"/>
+        android:onClick="btnLuftdrukGedrueckt"
+                android:minHeight="45dip" />
 
-    <Button
+            <Button
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Google Maps"
@@ -104,13 +108,20 @@
         android:layout_gravity="center_horizontal"
         android:onClick="btnGoogleMapsGedrueckt"/>
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="26dp"
-        android:text="Wanderung beenden - Datenauswertung anzeigen"
-        android:id="@+id/stop"
-        android:layout_weight="0.46"
-        android:onClick="btnWanderungBeendenGedrueck"/>
+            <Button
+                android:layout_width="fill_parent"
+                android:text="Wanderung beenden - Datenauswertung anzeigen"
+                android:id="@+id/stop"
+                android:layout_weight="0.95"
+                android:onClick="btnWanderungBeendenGedrueck"
+                android:layout_height="wrap_content" />
+
+            <Chronometer
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/chronometer"
+        android:gravity="center" />
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

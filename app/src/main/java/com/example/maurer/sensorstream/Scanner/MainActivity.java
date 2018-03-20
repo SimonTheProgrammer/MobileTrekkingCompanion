@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Device_Information d = new Device_Information(deviceHardwareAddress,bclass,deviceName,type);
                 Log.i("New Device",deviceHardwareAddress + ";"+deviceName);
-                if (deviceName.equals("MetaWear")) //nur MetaWear-Geräte anzeigen lassen
+                if (deviceName!=null && deviceName.equals("MetaWear")) //nur MetaWear-Geräte anzeigen lassen
                     addItems(d);
             }
         }

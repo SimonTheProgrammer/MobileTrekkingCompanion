@@ -14,11 +14,11 @@
 
     <ImageView
         android:layout_width="338dp"
-        android:layout_height="140dp"
         android:id="@+id/imageView"
         android:layout_gravity="center_horizontal"
         android:background="@drawable/logo"
-        android:layout_weight="9.70" />
+        android:layout_weight="9.70"
+        android:layout_height="142dp" />
 
     <Button
         android:layout_width="fill_parent"
@@ -54,6 +54,34 @@
             android:layout_height="wrap_content"
             android:id="@+id/btn_reset"
             android:contentDescription="entbindet Service vom Board (gibt Ressourcen frei)" />
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="43dp">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </TableLayout>
+
+        <TextView
+            android:layout_width="194dp"
+            android:layout_height="wrap_content"
+            android:text="Keine Verbindung"
+            android:id="@+id/tvVerbingungYesNo" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -61,12 +89,6 @@
         android:layout_width="match_parent"
         android:layout_height="49dp"
         android:gravity="center_horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Keine Verbindung"
-            android:id="@+id/tvVerbingungYesNo" />
 
     </LinearLayout>
 

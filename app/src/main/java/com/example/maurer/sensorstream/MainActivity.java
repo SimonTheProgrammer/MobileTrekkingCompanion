@@ -172,18 +172,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         // MetaWear board object for the Bluetooth Device
             board = serviceBinder.getMetaWearBoard(remoteDevice);
 
-        /*board.connectAsync().continueWith(new Continuation<Void, Task<Route>>() {
-            @Override
-            public Task<Route> then(Task<Void> task) throws Exception {
-                if (task.isFaulted()) {
-                    Lost();
-                } else {
-                    Succeed(macAddr);
-                }
-                return null;
-            }
-        });//*/
-
             board.connectAsync().onSuccessTask(new Continuation<Void, Task<Route>>() {
                 @Override
                 public Task<Route> then(Task<Void> task) throws Exception {
@@ -267,9 +255,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 dialog.dismiss();
-                                                Intent intent = new Intent(act, com.example.maurer.sensorstream.MainActivity.class);
-                                                intent.putExtra("Address","");
-                                                startActivity(intent);
                                             }
                                         });
                                 alert.show();
