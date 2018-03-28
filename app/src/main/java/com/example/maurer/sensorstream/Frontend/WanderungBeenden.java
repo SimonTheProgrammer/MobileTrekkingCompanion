@@ -16,6 +16,5 @@ public class WanderungBeenden extends AppCompatActivity {
         zeitbeendet = System.currentTimeMillis();
         long endZeit = zeitbeendet - abgelaufeneZeit;
         //zeitaufzeichnung.setText((int) endZeit);
-
     }
 }

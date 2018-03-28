@@ -1,5 +1,6 @@
 package com.example.maurer.sensorstream.Scanner;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothClass;
@@ -9,7 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,7 +38,7 @@ import java.util.TimerTask;
  */
 
 public class MainActivity extends AppCompatActivity {
-    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+    private static final int PERMISSION_SEND_SMS = 123;
     int REQUEST_ENABLE_BT = 1;
     ArrayList<Device_Information> listItems=new ArrayList<>();
     ArrayAdapter<Device_Information> adapter;
@@ -46,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_logging);
+
+        if (ContextCompat.checkSelfPermission(a,Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED){
+            Log.e("SMS","Permission denied");
+            requestSmsPermission();
+        }
 
         BluetoothAdapter mBluetoothAdapter =
                 BluetoothAdapter.getDefaultAdapter();
@@ -158,6 +167,15 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void requestSmsPermission() {
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            // request permission (see result in onRequestPermissionsResult() method)
+            ActivityCompat.requestPermissions(a,
+                    new String[]{Manifest.permission.SEND_SMS},
+                    PERMISSION_SEND_SMS);
+        }
+    }
 
     @Override
     protected void onDestroy() {

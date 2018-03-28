@@ -53,13 +53,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     String address;
     ThreadPool pool = null;
     Accelerometer accelerometer;
-    public static Logging logging;
-    private static final String LOG_TAG = "freefall";
-    Debug debug;
-
-    public final String SmsSenden = "06509808173";
-    Boolean pressedOnce=false;
-    Boolean canClose= true;
+    Boolean pressedOnce = false;
 
     /**
         @author: Simon Maurer
@@ -79,16 +73,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.startseite);
-        Button start = (Button) findViewById(R.id.Wnd_start);
-        Button ende = (Button) findViewById(R.id.stop);
-        Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);
 
         getApplicationContext().bindService(new Intent(this, BtleService.class),
                 this, Context.BIND_AUTO_CREATE);
-
-        Intent intent = getIntent();
-        address = intent.getStringExtra("Address"); //MAC ADDRESS
-        this.setTitle("MobileTrekkingCompanion");
+        start();
 
         // configure start button: (Start der Wanderung + Starten der Sensoren
         findViewById(R.id.Wnd_start).setOnClickListener(new View.OnClickListener() {
@@ -138,13 +126,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 startActivity(intent);
             }
         });
-
-        //Freefall
-
     }
 
-    public static Logging getLogging() {
-        return logging;
+    public void start(){
+        Intent intent = getIntent();
+        address = intent.getStringExtra("Address"); //MAC ADDRESS
+        this.setTitle("MobileTrekkingCompanion");
     }
 
     @Override
@@ -220,9 +207,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     if (task.isFaulted()) {
                         Lost();
                     } else {
-                        Log.i(LOG_TAG, "Connected");
-                        debug = board.getModule(Debug.class);
-                        logging= board.getModule(Logging.class);
                         Succeed(macAddr);
                     }
                     return null;

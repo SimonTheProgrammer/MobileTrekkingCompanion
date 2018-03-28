@@ -6,9 +6,14 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
 import com.example.maurer.sensorstream.MainActivity;
@@ -29,33 +34,6 @@ public class Notfallkontakthinzufuegen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notfallkontakthinzufuegen);
         kontaktDaten = new NotfallKontaktDaten();
-
-        /*final long StartListener;
-        start.setOnClickListener(StartListener);
-        final TextView vergangeneZeit = (TextView)findViewById(R.id.tvZeitaufzeichnungSeitBeginn);
-
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StartListener = SystemClock.uptimeMillis();
-       */  //   }
-        //   }); {
-           /* @Override
-            public void onClick(View v) {
-                StartListener = SystemClock.uptimeMillis();
-                chronometer.setBase(SystemClock.elapsedRealtime());
-                chronometer.start();
-                vergangeneZeit.setText((CharSequence) chronometer);
-                }
-        };*/
-
-        /*View.OnClickListener mStopListener = new View.OnClickListener() {
-            public void onClick(View v) {
-                Button start = (Button) findViewById(R.id.btnWanderungStarten);
-                Button ende = (Button) findViewById(R.id.btnWanderungBeenden);
-                Chronometer chronometer = (Chronometer) findViewById(R.id.chronometer);chronometer.stop();
-            }
-        };*/
 
         findViewById(R.id.cbEmail).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +94,12 @@ public class Notfallkontakthinzufuegen extends AppCompatActivity {
                     write.insertWithOnConflict("Kontaktdaten", null, cv, SQLiteDatabase.CONFLICT_FAIL);
 
                     startActivity(new Intent(Notfallkontakthinzufuegen.this, MainActivity.class));
+                }else if (isEmailValid(email)==false){
+                    Toast.makeText(Notfallkontakthinzufuegen.this, "EMail-Adresse nicht korrekt!", Toast.LENGTH_LONG).show();
+                    Log.e("Kontakt","Email falsch!");
+                }else{
+                    Toast.makeText(Notfallkontakthinzufuegen.this, "falsche Eingabe!", Toast.LENGTH_LONG).show();
+                    Log.e("Kontakt","Fehler :(");
                 }
             }
         });

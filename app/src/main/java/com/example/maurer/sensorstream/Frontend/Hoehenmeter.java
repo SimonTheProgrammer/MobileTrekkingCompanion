@@ -38,7 +38,14 @@ public class Hoehenmeter extends AppCompatActivity {
         plot.setRangeLabel("m");
         List series1Numbers = new LinkedList();
 
-        series1Numbers.add(0); //Start bei 0°C (Anfangswert)
+        //Anfangsvariable berechnen: Durchschnittswert von bisherigen Daten
+        float nr;
+        float ges = (float) 0.0;
+        for (int i=0;i<f.size();i++)
+            ges += (float) f.get(i);
+        nr = (ges/f.size());//*/
+
+        series1Numbers.add(nr); //Startwert
 
         for (int i=0;i<f.size();i++){
             Log.i("sizeHoehe",f.get(i)+"");

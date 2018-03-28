@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="°C"
-        android:id="@+id/textView3"
+        android:id="@+id/tvdurchschnittlicheTemperaturErgebnis"
         android:layout_gravity="right" />
 
     <TextView

@@ -2,7 +2,10 @@ package com.example.maurer.sensorstream.Frontend;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -10,6 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.maurer.sensorstream.Barometer_stream1;
+import com.example.maurer.sensorstream.Falling_stream1;
 import com.example.maurer.sensorstream.MainActivity;
 import com.example.maurer.sensorstream.R;
 import com.example.maurer.sensorstream.ThreadPool;
@@ -29,6 +34,9 @@ public class Datenanzeigen extends AppCompatActivity {
     ThreadPool pool;
     public static MetaWearBoard b;
 
+    public Datenanzeigen() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +45,16 @@ public class Datenanzeigen extends AppCompatActivity {
             pool = new ThreadPool();
             pool.initialize_Sensors(b);
             pool.start_Threads(act);
+
+            Barometer_stream1.activity = act;
         }
+        /*MediaPlayer m1 = MediaPlayer.create(this.getBaseContext(), 2130968576);
+        MediaPlayer m2 = MediaPlayer.create(this.getBaseContext(), 2130968579);
+        MediaPlayer m3 = MediaPlayer.create(this.getBaseContext(), 2130968580);
+        MediaPlayer m4 = MediaPlayer.create(this.getBaseContext(), 2130968581);
+        SensorManager manager = (SensorManager) this.getSystemService(SENSOR_SERVICE);
+        Falling_stream1 falling_stream1 = new Falling_stream1(m1,m2,m3,m4,manager);
+        falling_stream1.start();*/
 
         Calendar kalender = Calendar.getInstance();
         //TextView uhrzeit = (TextView) findViewById(R.id.tvUhrzeit);

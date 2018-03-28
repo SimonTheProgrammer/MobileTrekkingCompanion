@@ -2,11 +2,14 @@ package com.example.maurer.sensorstream;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
+import com.example.maurer.sensorstream.Frontend.Datenanzeigen;
 import com.example.maurer.sensorstream.Frontend.Hoehenmeter;
+import com.example.maurer.sensorstream.Frontend.Sturz;
 import com.example.maurer.sensorstream.Frontend.Temperatur;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.Route;
@@ -30,11 +33,12 @@ import bolts.Task;
  * Created by Maurer on 23.02.2018.
  */
 
-public class Barometer_stream1{
-
+public class Barometer_stream1 {
     Timer t = null;
     public LinkedList l_h = new LinkedList();
     public static List<Float> f = new LinkedList<>();
+    public static Activity activity;
+
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();
@@ -66,10 +70,23 @@ public class Barometer_stream1{
                 Log.i("HoeheGraph",f.size()+", "+data);
                 if (f.size()>3){
                     Hoehenmeter.f = (LinkedList) f;
+                    for (int i=f.size()-1;i<f.size();i++){
+                        float fall = f.get(i)-f.get(i-1);
+                        Log.e("falling",fall+"m");
+                        if (fall<-1.5){
+                            Log.e("falling","in freefall!");
+                            Fall_detected(activity);
+                        }
+                    }
                     Log.i("HoeheGraph","startklar");
                 }
             }
-        },date,5000);
+        },date,1000);
+    }
+
+    private void Fall_detected(Activity act){
+        Intent intent = new Intent(act,Sturz.class);
+        act.startActivity(intent);
     }
 
     float altitude;
