@@ -32,8 +32,7 @@ public class Temperatur extends AppCompatActivity {
     public static List<Float> f;
     XYPlot plot;
 
-    public Temperatur() {
-    }
+    public Temperatur() {}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +65,8 @@ public class Temperatur extends AppCompatActivity {
         }
         XYSeries series1 = new SimpleXYSeries(
                 series1Numbers, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Temperatur [°C]");
-        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.RED, Color.GREEN, Color.BLUE, null);
+        //int orange = Color.rgb(255,140,0);
+        LineAndPointFormatter series1Format = new LineAndPointFormatter(Color.LTGRAY, Color.CYAN, Color.parseColor("#ffa500"), null);
 
         series1Format.getLinePaint().setPathEffect(new DashPathEffect(new float[]{
                 PixelUtils.dpToPix(20),

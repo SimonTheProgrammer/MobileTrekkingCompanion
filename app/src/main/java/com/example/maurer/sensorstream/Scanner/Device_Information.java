@@ -46,6 +46,6 @@ public class Device_Information {
 
     @Override
     public String toString() {
-        return ""+address;
+        return ""+address+"                            "+getName();
     }
 }

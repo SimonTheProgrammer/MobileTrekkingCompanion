@@ -73,7 +73,7 @@ public class Temperature_stream {
                 }catch (Exception e){e.printStackTrace();}
 
                 Log.i("TempList(stream)",f.size()+", "+data);
-                if (f.size()>3){
+                if (f.size()>3){ //mind. 3 Werte für Anzeige in Graph
                     Temperatur.f = (LinkedList) f;
                     Log.i("tempGraph","startklar");
                 }
@@ -85,24 +85,18 @@ public class Temperature_stream {
     float temper;
     String s;
     SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-    float nr;
-    int count = 0;
 
     private float method(final Temperature.Sensor temp) {
         try{
             temp.addRouteAsync(new RouteBuilder() {
                 @Override
                 public void configure(RouteComponent source) {
-                    count = 0;
                     source.stream(new Subscriber() {
                         @Override
                         public void apply(Data data, Object... env) {
-
                             Calendar calendar = Calendar.getInstance();
                             s = format.format(calendar.getTime());
                             temper = data.value(Float.class);
-                            //mehr Daten bei Ausgabe!!
-                            Log.i("Daten",temper+"");
                         }
                     });
                 }
@@ -116,7 +110,6 @@ public class Temperature_stream {
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        Log.i("Temperatur(Endwert)",nr+"");
         return temper;
     }
 
@@ -131,6 +124,7 @@ public class Temperature_stream {
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Temperature", null, cv, SQLiteDatabase.CONFLICT_FAIL);
         }
+        db.close();
     }
 
     public void stop(){

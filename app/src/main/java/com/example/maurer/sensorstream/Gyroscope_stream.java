@@ -160,6 +160,7 @@ public class Gyroscope_stream {
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Gyroscope", null, cv, SQLiteDatabase.CONFLICT_FAIL);
         }
+        db.close();
     }
 
     public void stop(){

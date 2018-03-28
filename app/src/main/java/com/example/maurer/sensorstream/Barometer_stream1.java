@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
+import com.example.maurer.sensorstream.Frontend.Hoehenmeter;
+import com.example.maurer.sensorstream.Frontend.Temperatur;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.Subscriber;
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -31,6 +34,7 @@ public class Barometer_stream1{
 
     Timer t = null;
     public LinkedList l_h = new LinkedList();
+    public static List<Float> f = new LinkedList<>();
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();
@@ -47,8 +51,9 @@ public class Barometer_stream1{
                         l_h.add(s);
                         l_h.add(data);
                         Log.i("Altitude", l_h.getLast() + "  ("+l_h.size()+")");
-                    }
 
+                        f.add(method(barometer));
+                    }
                     //in die DB speichern
                     if (l_h.size() == 12)
                         Fetch_Hoehe(act,l_h);
@@ -57,6 +62,12 @@ public class Barometer_stream1{
                     if (l_h.size()>=12)
                         l_h.clear();
                 }catch(Exception e){}
+
+                Log.i("HoeheGraph",f.size()+", "+data);
+                if (f.size()>3){
+                    Hoehenmeter.f = (LinkedList) f;
+                    Log.i("HoeheGraph","startklar");
+                }
             }
         },date,5000);
     }
@@ -92,6 +103,7 @@ public class Barometer_stream1{
             }).continueWith(new Continuation<Route, Void>() {
                 @Override
                 public Void then(Task<Route> task) throws Exception {
+                    barometer.start();
                     return null;
                 }
             });
@@ -112,6 +124,7 @@ public class Barometer_stream1{
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Barometer_Hoehe", null, cv, SQLiteDatabase.CONFLICT_FAIL);
         }
+        db.close();
     }
 
     public void stop(){

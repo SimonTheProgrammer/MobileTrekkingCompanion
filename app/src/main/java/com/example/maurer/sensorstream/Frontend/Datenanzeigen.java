@@ -66,8 +66,6 @@ public class Datenanzeigen extends AppCompatActivity {
 
         abgelaufeneZeit = 0;
 
-
-
         findViewById(R.id.btnTemperatur).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,9 +100,7 @@ public class Datenanzeigen extends AppCompatActivity {
         findViewById(R.id.btnLuftdruck).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(Datenanzeigen.this, Geschwindigkeit.class);
-                intent.putExtra("baro",pool.barometer_stream.l_pa.toArray());
-                startActivity(intent);
+                startActivity(new Intent(Datenanzeigen.this, Luftdruck.class));
             }
         });
 
@@ -128,4 +124,3 @@ public class Datenanzeigen extends AppCompatActivity {
         });
     }
 }
-

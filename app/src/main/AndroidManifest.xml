@@ -73,6 +73,9 @@
         <activity android:name=".Frontend.Temperatur"
             android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".Frontend.WanderungBeenden"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

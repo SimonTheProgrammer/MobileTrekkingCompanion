@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
+import com.example.maurer.sensorstream.Frontend.Luftdruck;
+import com.example.maurer.sensorstream.Frontend.Temperatur;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.Subscriber;
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
@@ -31,11 +34,12 @@ import bolts.Task;
 public class Barometer_stream {
     public LinkedList l_pa = new LinkedList();
     Timer t = null;
+    public static List<Float> f = new LinkedList<>();
 
     public void start(final Activity act, final BarometerBmp280 barometer) {
         t = new Timer();
         Calendar c = Calendar.getInstance();
-        c.add(Calendar.SECOND,5);
+        c.add(Calendar.SECOND,3);
         Date date = c.getTime();
         t.schedule(new TimerTask() {
             @Override
@@ -47,6 +51,8 @@ public class Barometer_stream {
                         l_pa.add(s);
                         l_pa.add(data);
                         Log.i("Pressure",l_pa.getLast()+"  ("+l_pa.size()+")");
+
+                        f.add(method(barometer));
                     }
 
                     //in die DB speichern
@@ -57,6 +63,12 @@ public class Barometer_stream {
                     if (l_pa.size()>=12)
                         l_pa.clear();
                 }catch(Exception e){}
+
+                Log.i("Pressure(stream)",f.size()+", "+data);
+                if (f.size()>3){ //mind. 3 Werte für Anzeige in Graph
+                    Luftdruck.f = (LinkedList) f;
+                    Log.i("PressureGraph","startklar");
+                }
             }
         },date,5000);
     }
@@ -91,7 +103,7 @@ public class Barometer_stream {
         }).continueWith(new Continuation<Route, Void>() {
             @Override
             public Void then(Task<Route> task) {
-                //barometer.start();
+                barometer.start();
                 return null;
             }
         });
@@ -112,6 +124,7 @@ public class Barometer_stream {
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Barometer_Druck", null, cv, SQLiteDatabase.CONFLICT_FAIL);
         }
+        db.close();
     }
 
     public void stop(){

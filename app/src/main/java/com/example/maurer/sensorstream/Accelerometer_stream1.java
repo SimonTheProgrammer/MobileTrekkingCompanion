@@ -155,6 +155,7 @@ public class Accelerometer_stream1{
             SQLiteDatabase write = db.getWritableDatabase();
             write.insertWithOnConflict("Accelerometer", "Parameter", cv, SQLiteDatabase.CONFLICT_FAIL);
         }
+        db.close();
     }
 
     public void stop(){
