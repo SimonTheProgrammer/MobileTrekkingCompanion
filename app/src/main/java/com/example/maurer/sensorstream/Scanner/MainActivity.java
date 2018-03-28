@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.scan_logging);
 
+        BluetoothAdapter mBluetoothAdapter =
+                BluetoothAdapter.getDefaultAdapter();
         this.setTitle("Gerät verbinden");
         if (mBluetoothAdapter == null){
             AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-        }
+        } //Anzeige für Benutzer
         if (mListView == null)
             mListView = (ListView) findViewById(R.id.list);
 

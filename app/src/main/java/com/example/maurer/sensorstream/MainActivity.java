@@ -31,9 +31,12 @@ import com.mbientlab.metawear.android.BtleService;
 import com.mbientlab.metawear.builder.RouteBuilder;
 import com.mbientlab.metawear.builder.RouteComponent;
 import com.mbientlab.metawear.builder.filter.Comparison;
+import com.mbientlab.metawear.builder.filter.ThresholdOutput;
 import com.mbientlab.metawear.builder.function.Function1;
 import com.mbientlab.metawear.module.Accelerometer;
+import com.mbientlab.metawear.module.Debug;
 import com.mbientlab.metawear.module.Led;
+import com.mbientlab.metawear.module.Logging;
 
 import java.io.Serializable;
 import java.util.Timer;
@@ -50,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     String address;
     ThreadPool pool = null;
     Accelerometer accelerometer;
+    public static Logging logging;
+    private static final String LOG_TAG = "freefall";
+    Debug debug;
 
     public final String SmsSenden = "06509808173";
     Boolean pressedOnce=false;
@@ -88,18 +94,10 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         findViewById(R.id.Wnd_start).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("sensorstream","start");
-                //Sensoren einstellen:
-                /**
-                 * Accelerometer (+fallen)
-                 * Druck (mit Höhenmeter)
-                 * Temperatur
-                 * Gyrosensor
-                 * Magnetometer*/
+                /*logging.start(false);
                 accelerometer.acceleration().start();
-                accelerometer.start();
-
-
+                accelerometer.start();*/
+                Log.i("sensorstream","start");
                 pool = new ThreadPool();
                 try {
                     pool.initialize_Sensors(board);
@@ -108,16 +106,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 }
                 if (board!=null){
                     Intent intent = new Intent(act, com.example.maurer.sensorstream.Frontend.Datenanzeigen.class);
-                    //intent.putExtra("board", (Parcelable) board);
-                    //Transport to Activity
                     Datenanzeigen.b = board;
                     startActivity(intent);
                 }
-
             }
         });
 
-        //configure reset button:
+    //configure reset button:
         findViewById(R.id.btn_reset).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -143,6 +138,13 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 startActivity(intent);
             }
         });
+
+        //Freefall
+
+    }
+
+    public static Logging getLogging() {
+        return logging;
     }
 
     @Override
@@ -167,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     int counter = 0;
 
+
+
     //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
         Log.wtf("MAC",macAddr);
@@ -188,29 +192,37 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 public Task<Route> then(Task<Void> task) throws Exception {
                     accelerometer  = board.getModule(Accelerometer.class);
                     accelerometer.configure()
-                            .odr(25f)
+                            .odr(50f)
                             .commit();
 
-                    return accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
+                    /*return accelerometer.acceleration().addRouteAsync(new RouteBuilder() {
                         @Override
                         public void configure(RouteComponent source) {
-                            //Codestuff
-                            Log.i("falling","configure");
-                            source.map(Function1.RSS).lowpass((byte) 5).filter(Comparison.EQ,-1).stream(new Subscriber() {
+                            source.map(Function1.RSS).lowpass((byte) 4).filter(ThresholdOutput.BINARY, 0.3f)
+                                    .multicast()
+                                    .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
                                 @Override
                                 public void apply(Data data, Object... env) {
-                                    Log.i("falling","falling");
+                                    Log.i(LOG_TAG, data.formattedTimestamp() + ": Entered Free Fall");
+                                }
+                            }).to().filter(Comparison.EQ, 1).stream(new Subscriber() {
+                                @Override
+                                public void apply(Data data, Object... env) {
+                                    Log.i(LOG_TAG, data.formattedTimestamp() + ": Left Free Fall");
                                 }
                             }).end();
                         }
-                    });
-                }
+                    });*/
+                return null;}
             }).continueWith(new Continuation<Route, Void>() {
                 @Override
                 public Void then(Task<Route> task) throws Exception {
                     if (task.isFaulted()) {
                         Lost();
                     } else {
+                        Log.i(LOG_TAG, "Connected");
+                        debug = board.getModule(Debug.class);
+                        logging= board.getModule(Logging.class);
                         Succeed(macAddr);
                     }
                     return null;
@@ -248,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                             public void run() {
                                 Status_board(1);
                                 Toast.makeText(MainActivity.this, "Verbunden", Toast.LENGTH_LONG).show();
+                                Succeed(macAddr);
                                 cancel();
                             }
                         });
@@ -276,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     }
                 }
             }
-        },0,7000);
+        },0,6000);
     }
 
     public void Status_board(int i){
@@ -287,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         }else{
             TextView v = (TextView) findViewById(R.id.tvVerbingungYesNo);
             v.setText("Connected");
+            Succeed(address);
             v.setTextColor(getResources().getColor(R.color.accepted));
         }
     }
@@ -295,14 +309,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
         playLed(Led.Color.GREEN); //Output for user
     }
-
     //Aufruf, wenn keine Verbindung möglich
     private void Lost() {
         Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
     }
-
-    //plays LED in given color(3):
+    //plays LED in given color(RGB):
     private void playLed(Led.Color colour) {
         //LED
         Led led;

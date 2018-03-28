@@ -41,7 +41,7 @@ public class Device_Information {
         else if (type == 2)
             return " 2\n Power: 2,5 mW (4dBm) \n Reichweite: 10 Meter";
         else
-            return " 3\n Power: 1  (0dBm) \n Reichweite: 1 Meter";
+            return " 3\n Power: 1 mW (0dBm) \n Reichweite: 1 Meter";
     }
 
     @Override

@@ -22,7 +22,7 @@ public class MTCDatabaseOpenHelper extends SQLiteOpenHelper {
                 "val TEXT)");
         db.execSQL("CREATE TABLE Temperature("+
                 "Time TEXT,"+
-                "val INT)");
+                "val REAL)");
         db.execSQL("CREATE TABLE Accelerometer("+
                 "Time TEXT,"+
                 "valueX REAL,"+

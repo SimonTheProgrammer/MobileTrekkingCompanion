@@ -120,16 +120,16 @@ public class Gyroscope_stream {
                     valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
                     if (c_arr[18] == '-') {
                         valY = c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+"" + c_arr[22]+"" + c_arr[23]+""; //-valY
-                        if (c_arr[30] == '-')
-                            valZ = c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+""; //-valZ
+                        if (c_arr[32] == '-')
+                            valZ = c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+"" + c_arr[36]+"" + c_arr[37]+""; //-valZ
                         else
-                            valZ = c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+""; //valZ
+                            valZ = c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+"" + c_arr[36]+""; //valZ
                     } else {
                         valY = c_arr[18]+"" + c_arr[19] +""+ c_arr[20]+"" + c_arr[21]+"" + c_arr[22]+""; //valY
-                        if (c_arr[29] == '-')
-                            valZ = c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+""; //-valZ
+                        if (c_arr[31] == '-')
+                            valZ = c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+"" + c_arr[36]+""; //-valZ
                         else
-                            valZ = c_arr[29] +""+ c_arr[30]+"" + c_arr[31] +""+ c_arr[32]+"" + c_arr[33]+""; //valZ
+                            valZ = c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+""; //valZ
                     }
                 }
 //                                                       < ... >
@@ -143,10 +143,10 @@ public class Gyroscope_stream {
                             valZ = c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //valZ
                     } else {
                         valY = c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //valY
-                        if (c_arr[28] == '-')
-                            valZ = c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
+                        if (c_arr[30] == '-')
+                            valZ = c_arr[30]+"" + c_arr[31] +""+ c_arr[32]+"" + c_arr[33]+"" + c_arr[34]+"" + c_arr[35]+""; //-valZ
                         else
-                            valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30] +""+ c_arr[31] +""+ c_arr[32]+""; //valZ
+                            valZ = c_arr[30]+"" + c_arr[31]+"" + c_arr[32] +""+ c_arr[33] +""+ c_arr[34]+""; //valZ
                     }
                 }
                 Log.i("X Wert: ",""+valX);

@@ -111,6 +111,7 @@ public class Magnetometer_stream extends AppCompatActivity implements SensorEven
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+        //Gyro:
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             SensorManager.getRotationMatrixFromVector(rMat,sensorEvent.values);
             mAzimuth = (int) (Math.toDegrees(SensorManager.getOrientation(rMat,orientation)[0])+360)%360;

@@ -53,6 +53,7 @@ public class ThreadPool {//implements Parcelable{
                 tempSensor = temperature.findSensors
                         (Temperature.SensorType.PRESET_THERMISTOR)[0];//*/
     }
+
     android.os.Handler handler;
     Runnable runnable;
 

@@ -4,7 +4,7 @@
     android:layout_width="match_parent">
 
     <com.androidplot.xy.XYPlot
-        style="@style/APDefacto.Light"
+        style="@style/APDefacto.Dark"
         android:id="@+id/plot"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -12,6 +12,5 @@
         ap:rangeTitle="range"
         ap:domainTitle="domain"
         ap:lineLabels="left|bottom"
-        ap:lineLabelRotationBottom="-45"
-        />
+        ap:lineLabelRotationBottom="-45"/>
 </LinearLayout>

@@ -74,7 +74,7 @@ public class Timed_BatteryListener {
             Log.i("Liste", list.get(i) +"");
             list.remove(i);
         }
-    }
+    }//ThreadPool
 
     public  void stop(){
         t.cancel();

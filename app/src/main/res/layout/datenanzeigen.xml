@@ -61,7 +61,6 @@
         android:text="Temperatur"
         android:id="@+id/btnTemperatur"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnTemperaturGedrueckt"
                 android:minHeight="45dip" />
 
             <Button
@@ -70,7 +69,6 @@
         android:text="Geschwindigkeit"
         android:id="@+id/btnGeschwindigkeit"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnGeschwindigkeitGedrueckt"
                 android:minHeight="45dip" />
 
             <Button
@@ -79,7 +77,6 @@
         android:text="Höhenmeter"
         android:id="@+id/btnHoehenmeter"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnHoehenmeterGedrueckt"
                 android:minHeight="45dip" />
 
             <Button
@@ -88,7 +85,6 @@
         android:text="Pollenflugdaten"
         android:id="@+id/btnPollenflugdaten"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnPolltenflugdatenGedrueckt"
                 android:minHeight="45dip" />
 
             <Button
@@ -97,7 +93,6 @@
         android:text="Luftdruck"
         android:id="@+id/btnLuftdruck"
         android:layout_gravity="center_horizontal"
-        android:onClick="btnLuftdrukGedrueckt"
                 android:minHeight="45dip" />
 
             <Button
@@ -105,15 +100,13 @@
         android:layout_height="wrap_content"
         android:text="Google Maps"
         android:id="@+id/btnGoogleMaps"
-        android:layout_gravity="center_horizontal"
-        android:onClick="btnGoogleMapsGedrueckt"/>
+        android:layout_gravity="center_horizontal" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:text="Wanderung beenden - Datenauswertung anzeigen"
                 android:id="@+id/stop"
                 android:layout_weight="0.95"
-                android:onClick="btnWanderungBeendenGedrueck"
                 android:layout_height="wrap_content" />
 
             <Chronometer

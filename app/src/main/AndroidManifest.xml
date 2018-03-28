@@ -36,27 +36,43 @@
         <activity android:name=".Frontend.Datenanzeigen"
             android:screenOrientation="portrait">
         </activity>
-
         <activity android:name=".Frontend.Datenanalyse"
             android:screenOrientation="portrait">
         </activity>
-
         <activity android:name=".Frontend.Datenanzeigengeklickt"
             android:screenOrientation="portrait">
         </activity>
-
         <activity android:name=".Frontend.Notfallkontakthinzufuegen"
             android:screenOrientation="portrait">
         </activity>
-
         <activity android:name=".Frontend.Sturz"
             android:screenOrientation="portrait">
         </activity>
-
         <activity android:name=".Frontend.ZulangePause"
             android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name=".Frontend.Hoehenmeter"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.Geschwindigkeit"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.GoogleMaps"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.Graph"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.Luftdruck"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.Pollenflugdaten"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".Frontend.Temperatur"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>
