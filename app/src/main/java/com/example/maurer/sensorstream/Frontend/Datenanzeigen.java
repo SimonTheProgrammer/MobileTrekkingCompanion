@@ -95,7 +95,6 @@ public class Datenanzeigen extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Datenanzeigen.this, Geschwindigkeit.class);
-                intent.putExtra("accelero",pool.accelerometer_stream.list.toArray());
                 startActivity(intent);
             }
         });
@@ -127,6 +126,7 @@ public class Datenanzeigen extends AppCompatActivity {
                 startActivity(new Intent(Datenanzeigen.this, GoogleMaps.class));
             }
         });
+
         findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

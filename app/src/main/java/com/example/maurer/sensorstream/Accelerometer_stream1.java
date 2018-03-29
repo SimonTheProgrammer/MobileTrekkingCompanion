@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.maurer.sensorstream.DB.MTCDatabaseOpenHelper;
+import com.example.maurer.sensorstream.Frontend.Geschwindigkeit;
 import com.mbientlab.metawear.Data;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.Subscriber;
@@ -18,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,6 +34,10 @@ public class Accelerometer_stream1{
 
     public LinkedList list = new LinkedList();
     Timer t;
+    public static List<String> x = new LinkedList<>();
+    public static List<String> y = new LinkedList<>();
+    public static List<String> z = new LinkedList<>();
+    long period = 1500;
 
     public void start(final Activity act,final Accelerometer accelerometer){
         t = new Timer();
@@ -48,7 +54,10 @@ public class Accelerometer_stream1{
                         list.add(s);
                         list.add(data);
                         Log.i("Accelerometer",list.getLast()+"  ("+list.size()+")");
+
+                        getCoord(list.getLast()+"");
                     }
+
 
                     //in die DB speichern
                     if (list.size() == 12)
@@ -58,8 +67,67 @@ public class Accelerometer_stream1{
                     if (list.size()>=12)
                         list.clear();
                 }catch(Exception e){}
+
+                Log.i("AccList(stream)",x.size()+", "+data);
+
+                if (x.size()>3) { //mind. 3 Werte für Anzeige in Graph
+                    Geschwindigkeit.x = (LinkedList) x;
+                    Geschwindigkeit.y = (LinkedList) y;
+                    Geschwindigkeit.z = (LinkedList) z;
+                    Log.i("AccGraph", "startklar");
+                    period = 5000;
+                }
             }
-        },date,5000);
+        },date,period);
+    }
+
+    private void getCoord(String line) {
+        String valX;
+        String valY;
+        String valZ;
+
+        char[]c_arr = line.toCharArray();
+
+        if (c_arr[4] == '-') {
+            valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+"" + c_arr[9]+""; //-valX
+            if (c_arr[16] == '-') {
+                valY = c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+"" + c_arr[21]+""; //-valY
+                if (c_arr[28] == '-')
+                    valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+"" + c_arr[33]+""; //-valZ
+                else
+                    valZ = c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //valZ
+            } else {
+                valY = c_arr[16]+"" + c_arr[17] +""+ c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //valY
+                if (c_arr[27] == '-')
+                    valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
+                else
+                    valZ = c_arr[27] +""+ c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+""; //valZ
+            }
+        }
+//                                                       < ... >
+        else {
+            valX = c_arr[4]+"" + c_arr[5]+"" + c_arr[6]+"" + c_arr[7]+"" + c_arr[8]+""; //valX
+            if (c_arr[15] == '-') {
+                valY = c_arr[15] +""+ c_arr[16] +""+ c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+"" + c_arr[20]+""; //-valY
+                if (c_arr[27] == '-')
+                    valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29] +""+ c_arr[30]+"" + c_arr[31]+"" + c_arr[32]+""; //-valZ
+                else
+                    valZ = c_arr[27]+"" + c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //valZ
+            } else {
+                valY = c_arr[15]+"" + c_arr[16]+"" + c_arr[17]+"" + c_arr[18]+"" + c_arr[19]+""; //valY
+                if (c_arr[26] == '-')
+                    valZ = c_arr[26]+"" + c_arr[27] +""+ c_arr[28]+"" + c_arr[29]+"" + c_arr[30]+"" + c_arr[31]+""; //-valZ
+                else
+                    valZ = c_arr[26]+"" + c_arr[27]+"" + c_arr[28] +""+ c_arr[29] +""+ c_arr[30]+""; //valZ
+            }
+        }
+        Log.i("X Wert: ",""+valX);
+        Log.i("Y Wert: ",""+valY);
+        Log.i("Z Wert: ",""+valZ);
+
+        x.add(valX);
+        y.add(valY);
+        z.add(valZ);
     }
 
     String dat;
@@ -87,6 +155,8 @@ public class Accelerometer_stream1{
         }).continueWith(new Continuation<Route, Void>() {
             @Override
             public Void then(Task<Route> task) throws Exception {
+                accelerometer.acceleration().start();
+                accelerometer.start();
                 return null;
             }
         });
