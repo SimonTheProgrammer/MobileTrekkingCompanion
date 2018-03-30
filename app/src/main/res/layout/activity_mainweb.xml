@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.maurer.sensorstream.web.mainactivity">
+<!--
+    <com.hitomi.cmlibrary.CircleMenu
+        android:id="@+id/circle_menu"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+        -->
+    <!--
+       <it.moondroid.coverflow.components.ui.containers.FeatureCoverFlow
+
+           android:id="@+id/coverFlow"
+
+
+
+           android:layout_height="match_parent"
+           android:layout_width="match_parent"
+           app:coverHeight="200dp"
+           app:coverWidth="140dp"
+           app:maxScaleFactor="1.5"
+           app:reflectionGap="0px"
+           app:scalingThreshold="0.5"
+           app:rotationThreshold="0.5"
+           app:spacing="0.5"
+
+
+           />
+
+        <TextSwitcher
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentBottom="true"
+            />
+    -->
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Map"
+        android:id="@+id/btnMap" />
+
+    <ImageView
+        android:id="@+id/reloadweatheract"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/btnWeather"
+        android:layout_marginTop="55dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_refresh_weatheractivity"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="Weather"
+        android:id="@+id/btnWeather" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="78dp"
+        android:id="@+id/coords"
+        android:layout_below="@+id/btnWeather"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/coords"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="17dp"
+        android:id="@+id/location" />
+
+
+</RelativeLayout>

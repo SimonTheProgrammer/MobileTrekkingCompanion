@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<item
+    android:id="@+id/action_setting"
+    android:title="Settings"
+    app:showAsAction="collapseActionView"/>
+    <item android:id="@+id/samplerate_setting"
+        android:title="Samplerate"
+        app:showAsAction="collapseActionView"></item>
+</menu>

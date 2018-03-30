@@ -39,6 +39,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_SEND_SMS = 123;
+    private static final int PERMISSION_LOCATION = 9001;
     int REQUEST_ENABLE_BT = 1;
     ArrayList<Device_Information> listItems=new ArrayList<>();
     ArrayAdapter<Device_Information> adapter;
@@ -54,6 +55,14 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(a,Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED){
             Log.e("SMS","Permission denied");
             requestSmsPermission();
+        }
+        if (ContextCompat.checkSelfPermission(a,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            Log.e("Access FINE","Permission denied");
+            requestLocationPermission();
+        }
+        if (ContextCompat.checkSelfPermission(a,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
+            Log.e("Access FINE","Permission denied");
+            requestLocationCoarsePermission();
         }
 
         BluetoothAdapter mBluetoothAdapter =
@@ -174,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(a,
                     new String[]{Manifest.permission.SEND_SMS},
                     PERMISSION_SEND_SMS);
+        }
+    }
+
+    private void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // request permission (see result in onRequestPermissionsResult() method)
+            ActivityCompat.requestPermissions(a,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSION_LOCATION);
+        }
+    }
+
+    private void requestLocationCoarsePermission() {
+        if (ContextCompat.checkSelfPermission(a, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // request permission (see result in onRequestPermissionsResult() method)
+            ActivityCompat.requestPermissions(a,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSION_LOCATION);
         }
     }
 

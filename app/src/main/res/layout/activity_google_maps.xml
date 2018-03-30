@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_google_maps"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.kalti.diplo.GoogleMapsActivity">
+
+
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/mapsSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:elevation="10dp"
+        android:background="@drawable/searchbar_border">
+
+        <ImageView
+            android:id="@+id/ic_magnify"
+            android:src="@drawable/ic_magnify"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/mapSearchText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/ic_magnify"
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:textColor="#000"
+            android:background="@null"
+            android:hint="Enter Origin Address"
+            android:layout_marginLeft="10dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            />
+
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/mapsSearchBar2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="51dp"
+
+        android:elevation="10dp"
+        android:background="@drawable/searchbar_border">
+
+        <ImageView
+            android:id="@+id/ic_magnify2"
+            android:src="@drawable/ic_magnify"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"/>
+
+        <AutoCompleteTextView
+            android:id="@+id/mapSearchText2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/ic_magnify2"
+            android:textSize="14sp"
+            android:layout_centerVertical="true"
+            android:textColor="#000"
+            android:background="@null"
+            android:hint="Enter Destination Address"
+            android:layout_marginLeft="10dp"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            />
+
+
+    </RelativeLayout>
+    <Button
+        android:id="@+id/findpath"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Find path"
+        android:layout_marginTop="100dp"/>
+    <Button
+        android:id="@+id/hightprofile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/findpath"
+        android:text="Height Profile"
+        android:layout_marginTop="100dp"/>
+    <TextView
+        android:id="@+id/distanceBetweenAB"
+        android:layout_toRightOf="@id/hightprofile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:layout_marginLeft="10dp"
+        android:text="0.0 km"/>
+    <TextView
+        android:id="@+id/PeriodBetweenAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/distanceBetweenAB"
+        android:layout_marginTop="120dp"
+        android:layout_marginLeft="20dp"
+        android:text="0 mins"/>
+
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        android:layout_below="@id/findpath"
+        tools:context=".GoogleMapsActivity"
+        android:name="com.google.android.gms.maps.SupportMapFragment" />
+
+<ImageView
+    android:id="@+id/ic_gps"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    android:layout_marginRight="15dp"
+    android:layout_marginTop="105dp"
+    android:src="@drawable/ic_gps"
+    android:clickable="true"
+    android:layout_alignParentRight="true"
+    android:layout_below="@+id/mapsSearchBar"
+    android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/travelmodeView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ic_gps"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/ic_travelmode"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        />
+
+    <ImageView
+        android:id="@+id/placePicker"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="105dp"
+        android:layout_below="@+id/mapsSearchBar"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_map"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/placePicker"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/place_info"
+        android:src="@drawable/ic_infotext"/>
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="10dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/distance"
+        android:src="@drawable/ic_directiondistance"
+        />
+
+
+</RelativeLayout>

@@ -7,4 +7,6 @@
     <color name="accepted">#7CFB14</color>
     <color name="choco">#D2691E</color>
     <color name="right">#A2D8A5</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="colorWhiteTransp">#80ffffff</color>
 </resources>

@@ -106,13 +106,6 @@ public class Datenanzeigen extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.btnPollenflugdaten).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Datenanzeigen.this, Pollenflugdaten.class));
-            }
-        });
-
         findViewById(R.id.btnLuftdruck).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +116,8 @@ public class Datenanzeigen extends AppCompatActivity {
         findViewById(R.id.btnGoogleMaps).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(Datenanzeigen.this, GoogleMaps.class));
+                Intent intent = new Intent(act, com.example.maurer.sensorstream.web.mainactivity.class);
+                startActivity(intent);
             }
         });
 

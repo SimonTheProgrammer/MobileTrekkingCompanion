@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/modeWalking"
+        android:title="walking"/>
+    <item android:id="@+id/modeDriving"
+        android:title="driving"/>
+    <item android:id="@+id/modeBicycling"
+        android:title="bicycling"/>
+</menu>

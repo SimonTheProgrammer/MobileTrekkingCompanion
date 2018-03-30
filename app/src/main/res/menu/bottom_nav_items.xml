@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="@string/nav_weather_home"
+        android:icon="@drawable/ic_weather_home"
+        android:id="@+id/nav_weather" />
+    <item android:title="@string/nav_weatherForecast"
+        android:icon="@drawable/ic_forecast"
+        android:id="@+id/nav_forecast" />
+    <item android:title="@string/nav_weather_noti"
+        android:icon="@drawable/ic_weather_notification"
+        android:id="@+id/nav_notification" />
+</menu>

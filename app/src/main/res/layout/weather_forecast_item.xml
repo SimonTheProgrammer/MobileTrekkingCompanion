@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="15dp"
+        >
+
+        <TextView
+            android:id="@+id/weather_forecast_day"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Time"/>
+
+        <TextView
+            android:id="@+id/weather_forecast_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:text="Day"/>
+        <TextView
+            android:id="@+id/weather_forecast_time"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/weather_forecast_day"
+            android:text="Date"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_below="@+id/weather_forecast_time"
+            android:layout_height="5dp"
+            android:id="@+id/splitter"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/weather_forecast_temp"
+            android:text="Temp"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_width="wrap_content"
+            android:layout_below="@id/splitter"
+            android:layout_height="wrap_content"
+
+            />
+
+
+        <TextView
+            android:id="@+id/weather_forecast_maxtemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:layout_below="@id/splitter"
+            android:textColor="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:text="maxTemp"/>
+        <TextView
+            android:id="@+id/weather_forecast_mintemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/weather_forecast_maxtemp"
+            android:text="minTemp"/>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_below="@+id/weather_forecast_mintemp"
+            android:layout_height="5dp"
+            android:id="@+id/splitter2"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/weather_forecast_condition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splitter2"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Condition"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_below="@+id/weather_forecast_condition"
+            android:layout_height="5dp"
+            android:id="@+id/splitter3"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/weather_forecast_pressure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splitter3"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Pressure"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_below="@+id/weather_forecast_pressure"
+            android:layout_height="5dp"
+            android:id="@+id/splitter4"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/darker_gray"/>
+
+        <TextView
+            android:id="@+id/weather_forecast_wind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splitter4"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Wind"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_below="@+id/weather_forecast_wind"
+            android:layout_height="5dp"
+            android:id="@+id/splitter5"
+            android:layout_marginBottom="10dp"
+            android:background="@android:color/darker_gray"/>
+        <TextView
+            android:id="@+id/weather_forecast_humidity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/splitter5"
+            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:text="Humidity"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="latitude"
+            android:id="@+id/weather_item_latitude"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="latitude"
+            android:id="@+id/weather_item_longtitude"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/weather_item_latitude"
+            android:layout_alignParentRight="true"
+            android:visibility="gone"/>
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_weather"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/background3"
+
+    tools:context="com.example.kalti.diplo.WeatherActivity">
+
+    <android.support.design.widget.BottomNavigationView
+        android:layout_width="match_parent"
+        android:id="@+id/weathernav"
+        android:layout_height="58dp"
+        app:menu="@menu/bottom_nav_items"
+        android:layout_alignParentBottom="true"
+        app:itemBackground="@color/colorPrimary"
+        app:itemIconTint="@color/nav_item_colors"
+        app:itemTextColor="@color/nav_item_colors"
+        android:layout_alignParentStart="true"></android.support.design.widget.BottomNavigationView>
+
+    <FrameLayout
+        android:id="@+id/weatherframe"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/weathernav">
+
+    </FrameLayout>
+
+
+</RelativeLayout>
