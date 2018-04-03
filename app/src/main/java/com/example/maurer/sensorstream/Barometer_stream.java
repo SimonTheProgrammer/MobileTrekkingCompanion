@@ -64,7 +64,7 @@ public class Barometer_stream {
                         l_pa.clear();
                 }catch(Exception e){}
 
-                Log.i("Pressure(stream)",f.size()+", "+data);
+                Log.i("Pressure(ret)",f.size()+", "+data);
                 if (f.size()>3){ //mind. 3 Werte für Anzeige in Graph
                     Luftdruck.f = (LinkedList) f;
                     Log.i("PressureGraph","startklar");

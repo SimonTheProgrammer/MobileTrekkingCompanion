@@ -72,7 +72,7 @@ public class Temperature_stream {
                         list.clear();
                 }catch (Exception e){e.printStackTrace();}
 
-                Log.i("TempList(stream)",f.size()+", "+data);
+                Log.i("TempList(ret)",f.size()+", "+data);
                 if (f.size()>3){ //mind. 3 Werte für Anzeige in Graph
                     Temperatur.f = (LinkedList) f;
                     Log.i("tempGraph","startklar");

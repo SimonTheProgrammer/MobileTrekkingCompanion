@@ -68,7 +68,7 @@ public class Accelerometer_stream1{
                         list.clear();
                 }catch(Exception e){}
 
-                Log.i("AccList(stream)",x.size()+", "+data);
+                Log.i("AccList(ret)",x.size()+", "+data);
 
                 if (x.size()>3) { //mind. 3 Werte für Anzeige in Graph
                     Geschwindigkeit.x = (LinkedList) x;

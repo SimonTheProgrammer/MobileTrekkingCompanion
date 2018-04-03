@@ -100,7 +100,7 @@
                 android:text="Wanderung beenden - Datenauswertung anzeigen"
                 android:id="@+id/stop"
                 android:layout_height="34dp"
-                android:layout_weight="0.37" />
+                android:layout_weight="0.76" />
 
             <Chronometer
         android:layout_width="0dp"

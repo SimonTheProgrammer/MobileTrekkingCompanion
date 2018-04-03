@@ -12,14 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.maurer.sensorstream.Frontend.Datenanzeigen;
 import com.example.maurer.sensorstream.Frontend.Notfallkontakthinzufuegen;
-import com.example.maurer.sensorstream.Frontend.Sturz;
-import com.example.maurer.sensorstream.Frontend.ZulangePause;
 import com.mbientlab.metawear.MetaWearBoard;
 import com.mbientlab.metawear.Route;
 import com.mbientlab.metawear.android.BtleService;
@@ -44,14 +45,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     /**
         @author: Simon Maurer
-        @problem: Starten mehrerer Sensoren am Board (mit Threads)
-                  => müssen parallel laufen -->(quasi-parallel!!)
         @sensors:
             Accelerometer
             Barometer
             Gyroskop
             Temperatur
-            Magnetometer
+            Magnetometer -> Kompass
         @link: C:\...\Dropbox\201718_DA_Wanderapp\05_Tätigkeitsberichte\Programm_Simon.docx
         @MainActivity: Wahrscheinlich etwas ausgelastet
      */
@@ -76,13 +75,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                 pool = new ThreadPool();
                 try {
                     pool.initialize_Sensors(board);
-                }catch(Exception e){
-                    Log.e("ERROR","No connected Board");
-                }
-                if (board!=null){
                     Intent intent = new Intent(act, com.example.maurer.sensorstream.Frontend.Datenanzeigen.class);
                     Datenanzeigen.b = board;
                     startActivity(intent);
+                }catch(Exception e){
+                    Log.e("ERROR","No connected Board");
+                    Toast.makeText(act, "Kein MetaWearBoard erkannt!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -143,8 +141,6 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
 
     int counter = 0;
 
-
-
     //Verbindung mit dem MetaBoard herstellen
     public void retrieveBoard(final String macAddr) {
         Log.wtf("MAC",macAddr);
@@ -174,12 +170,12 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                         public void configure(RouteComponent source) {
                             source.map(Function1.RSS).lowpass((byte) 4).filter(ThresholdOutput.BINARY, 0.3f)
                                     .multicast()
-                                    .to().filter(Comparison.EQ, -1).stream(new Subscriber() {
+                                    .to().filter(Comparison.EQ, -1).ret(new Subscriber() {
                                 @Override
                                 public void apply(Data data, Object... env) {
                                     Log.i(LOG_TAG, data.formattedTimestamp() + ": Entered Free Fall");
                                 }
-                            }).to().filter(Comparison.EQ, 1).stream(new Subscriber() {
+                            }).to().filter(Comparison.EQ, 1).ret(new Subscriber() {
                                 @Override
                                 public void apply(Data data, Object... env) {
                                     Log.i(LOG_TAG, data.formattedTimestamp() + ": Left Free Fall");
@@ -240,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
                     if (counter > 2) {
                         timer.cancel();
                         Log.i("Board", "Connection failed");
+                        Lost();
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -266,23 +263,23 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     public void Status_board(int i){
         if (i == 0){
             TextView v = (TextView) findViewById(R.id.tvVerbingungYesNo);
-            v.setText("Connection failed");
+            v.setText("Nicht verbunden");
             v.setTextColor(getResources().getColor(R.color.error));
         }else{
             TextView v = (TextView) findViewById(R.id.tvVerbingungYesNo);
-            v.setText("Connected");
+            v.setText("Verbunden");
             Succeed(address);
             v.setTextColor(getResources().getColor(R.color.accepted));
         }
     }
     private void Succeed(String macAddr) {
         Log.i("Board", "Connected to " + macAddr);
-        Toast.makeText(MainActivity.this, "Connected to "+macAddr, Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Verbunden mit "+macAddr, Toast.LENGTH_LONG).show();
         playLed(Led.Color.GREEN); //Output for user
     }
     //Aufruf, wenn keine Verbindung möglich
     private void Lost() {
-        Toast.makeText(MainActivity.this, "Failed to connect", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Verbindung nicht möglich!", Toast.LENGTH_LONG).show();
         Log.i("Board", "Connection failed");
     }
     //plays LED in given color(RGB):
@@ -324,31 +321,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        //int i = getFragmentManager().getBackStackEntryCount();
-        //if (i > 0) {
-        //   getFragmentManager().popBackStack();
-        // if (i == 1) {
-        //  ImageView ivStart = (ImageView) findViewById(R.id.ivStart);
-        // ivStart.setColorFilter(Color.rgb(255, 255, 255), android.graphics.PorterDuff.Mode.MULTIPLY);
-        //   }
-        // } //else
-        //super.onBackPressed();
-
     }
-
-    public void zuLangePause(final View sources) {
-
-        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, ZulangePause.class));
-
-    }
-
-    public void sturzWahrgenommen(final View sources) {
-
-        startActivity(new Intent(com.example.maurer.sensorstream.MainActivity.this, Sturz.class));
-
-
-    }
-
 
     @Override
     public void onStart() {
@@ -359,7 +332,5 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     @Override
     public void onStop() {
         super.onStop();
-
-
     }
 }

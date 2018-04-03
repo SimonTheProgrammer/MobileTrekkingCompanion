@@ -11,7 +11,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.media.audiofx.BassBoost;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter<Device_Information> adapter;
     private ListView mListView;
     Activity a = this;
+    private LocationManager locationManager;
     int counter=0;
 
     @Override
@@ -57,11 +62,11 @@ public class MainActivity extends AppCompatActivity {
             requestSmsPermission();
         }
         if (ContextCompat.checkSelfPermission(a,Manifest.permission.ACCESS_FINE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-            Log.e("Access FINE","Permission denied");
+            Log.e("AccessFINE","Permission denied");
             requestLocationPermission();
         }
         if (ContextCompat.checkSelfPermission(a,Manifest.permission.ACCESS_COARSE_LOCATION)!=PackageManager.PERMISSION_GRANTED){
-            Log.e("Access FINE","Permission denied");
+            Log.e("AccessCOARSE","Permission denied");
             requestLocationCoarsePermission();
         }
 
@@ -83,6 +88,39 @@ public class MainActivity extends AppCompatActivity {
         } //Anzeige für Benutzer
         if (mListView == null)
             mListView = (ListView) findViewById(R.id.list);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(locationManager.NETWORK_PROVIDER);
+        if (location != null) {
+            if (location.getLatitude() == 0.0 && location.getLongitude() == 0.0) {
+                //Enable GPS:
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(a);
+                alertDialog.setTitle("GPS deaktiviert");
+                alertDialog
+                        .setMessage("GPS ist deaktiviert. Wollen Sie ihre Einstellungen ändern?");
+
+                // On pressing Settings button
+                alertDialog.setPositiveButton("Aktivieren",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(
+                                        Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                a.startActivity(intent);
+                            }
+                        });
+                alertDialog.setNegativeButton("Abbrechen",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                alertDialog.show();
+            }
+        }
 
         adapter=new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,7 +60,7 @@
 
     <Button
         android:id ="@+id/push_button"
-        android:layout_width="150dp"
+        android:layout_width="169dp"
         android:layout_height="150dp"
         android:text="Notruf nicht absetzen!!"
         android:textColor="@android:color/black"
@@ -67,5 +68,6 @@
         android:padding="15dp"
         android:layout_gravity="center_horizontal"
         android:textSize="25dp"
-        android:onClick="btnNotrufNichtAbsetzen"/>
+        android:onClick="btnNotrufNichtAbsetzen"
+        android:layout_weight="0.54" />
 </LinearLayout>

@@ -20,6 +20,7 @@ import java.util.List;
 public class Hoehenmeter extends AppCompatActivity {
     XYPlot plot;
     public static List<Float> f;
+    public static List series1Numbers = new LinkedList();
 
     public Hoehenmeter() {}
 
@@ -35,9 +36,7 @@ public class Hoehenmeter extends AppCompatActivity {
         plot = (XYPlot) findViewById(R.id.plot);
         plot.setTitle("Hoehenmeter");
         plot.setDomainLabel("Zeit");
-        plot.setRangeLabel("m");
-        List series1Numbers = new LinkedList();
-
+        plot.setRangeLabel("");
         //Anfangsvariable berechnen: Durchschnittswert von bisherigen Daten
         float nr;
         float ges = (float) 0.0;
@@ -47,8 +46,8 @@ public class Hoehenmeter extends AppCompatActivity {
 
         series1Numbers.add(nr); //Startwert
 
-        for (int i=0;i<f.size();i++){
-            Log.i("sizeHoehe",f.get(i)+"");
+        for (int i=0;i<f.size();i++) {
+            Log.i("sizeHoehe", f.get(i) + "");
             series1Numbers.add(f.get(i));
         }
         XYSeries series1 = new SimpleXYSeries(
@@ -63,5 +62,26 @@ public class Hoehenmeter extends AppCompatActivity {
 
         plot.addSeries(series1, series1Format);
         Log.i("Temperature", "updated graph");
+
+        WanderungBeenden.avg_hoehe=stop(f);
+    }
+
+    public float stop(LinkedList<Float> f){
+        List list = new LinkedList();
+        float lowest=10000;
+        float highest=0;
+
+        for (int i=0;i<f.size();i++){
+            Log.i("size",f.get(i)+"");
+            list.add(f.get(i));
+        }
+        //min/max
+        for (int i=0;i<list.size();i++){
+            if ((float) list.get(i)<lowest)
+                lowest = (float) list.get(i);
+            if ((float) list.get(i)>highest)
+                highest = (float) list.get(i);
+        }
+        return highest-lowest;
     }
 }

@@ -1,6 +1,5 @@
 package com.example.maurer.sensorstream.Frontend;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.os.Bundle;
@@ -11,26 +10,18 @@ import com.androidplot.util.PixelUtils;
 import com.androidplot.xy.CatmullRomInterpolator;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
-import com.androidplot.xy.XYGraphWidget;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYSeries;
 import com.example.maurer.sensorstream.R;
-import com.example.maurer.sensorstream.Temperature_stream;
 
-import java.lang.reflect.Array;
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Temperatur extends AppCompatActivity {
     public static List<Float> f;
+    public List series1Numbers = new LinkedList();
     XYPlot plot;
+    public float avg;
 
     public Temperatur() {}
 
@@ -48,7 +39,6 @@ public class Temperatur extends AppCompatActivity {
         plot.setTitle("Temperatur");
         plot.setDomainLabel("Zeit");
         plot.setRangeLabel("°C");
-        List series1Numbers = new LinkedList();
 
         //Anfangsvariable berechnen: Durchschnittswert von bisherigen Daten
         /*float nr;
@@ -56,13 +46,19 @@ public class Temperatur extends AppCompatActivity {
         for (int i=0;i<f.size();i++)
             ges += (float) f.get(i);
         nr = (ges/f.size());//*/
-
         series1Numbers.add(0); //Start bei 0°C (Anfangswert)
 
+        int count = 0;
         for (int i=0;i<f.size();i++){
+            count++;
             Log.i("size",f.get(i)+"");
             series1Numbers.add(f.get(i));
+            this.avg += (float) f.get(i);
+            this.avg = avg/ count;
+            Log.e("Checkpoint","avg="+avg);
+            Datenanalyse.avg_temp = avg;
         }
+
         XYSeries series1 = new SimpleXYSeries(
                 series1Numbers, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, "Temperatur [°C]");
         //int orange = Color.rgb(255,140,0);
@@ -76,6 +72,25 @@ public class Temperatur extends AppCompatActivity {
 
         plot.addSeries(series1, series1Format);
         Log.i("Temperature", "updated graph");
+
+        Log.e("STOP",stop(f)+"");
+        //Datenanalyse.avg_temp=stop(f);
+        WanderungBeenden.avg_temp=stop(f);
     }
 
+    public float stop(LinkedList<Float> f){
+        List list = new LinkedList();
+        int count=0;
+        float erg=0;
+
+        for (int i=0;i<f.size();i++){
+            Log.i("size",f.get(i)+"");
+            list.add(f.get(i));
+        }
+        for (int i=0;i<list.size();i++){
+            erg+=(float) list.get(i);
+            count++;
+        }
+        return erg/count;
+    }
 }
